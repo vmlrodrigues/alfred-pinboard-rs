@@ -46,6 +46,7 @@ After initial [setup](#installation--setup):
 - Safari Tech. Preview
 - Brave Beta
 - Chrome
+- Helium
 
 ## Installation / Setup
 After [downloading](https://github.com/spamwax/alfred-pinboard-rs/releases/latest) the latest version of the workflow and installing it in Alfred, you need to do a one-time setup to authenticate the Workflow. This Workflow only uses username/token method so you won't need to enter your password. (This is the *suggested* way of using Pinboard's API).
