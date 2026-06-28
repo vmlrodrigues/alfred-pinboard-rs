@@ -52,6 +52,8 @@ strip ./alfred-pinboard-rs || true
 chmod u+x ./alfred-pinboard-rs
 if [[ "$RELEASE_COMMIT" == "true" ]]; then
   build_alfred_bundle "$src" "$stage"
-else
+elif [[ -n "$PINBOARD_TOKEN" ]]; then
   .github/workflows/run_tests.sh ./alfred-pinboard-rs "$PINBOARD_TOKEN"
+else
+  echo "PINBOARD_TOKEN not set; skipping API tests"
 fi
