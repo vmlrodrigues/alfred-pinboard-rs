@@ -6,7 +6,6 @@ on:
     branches:
       - master
   workflow_dispatch:
-  # For quickly detecting important differences in runner configurations
 
 name: tests
 
@@ -18,22 +17,15 @@ jobs:
   build_universal:
     name: Run non-fat tests on ubuntu
     runs-on: ubuntu-latest
-    # if: ${{ github.ref_type == 'branch' && github.ref_name == 'develop' }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build x86_64 (Debug)
-        uses: actions-rs/cargo@v1
         if: ${{ env.RELEASE_COMMIT != 'true' }}
-        with:
-          command: build
+        run: cargo build
 
       - name: Run tests
         run: .github/workflows/run_tests.sh ${{ github.workspace }}/target/debug/alfred-pinboard-rs
