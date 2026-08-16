@@ -12,6 +12,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # rusty-pin is a git dependency pinned by rev, so Dependabot will not
-    # touch it. It is updated by hand from the fork at vmlrodrigues/rusty-pin.
+    # rusty-pin and alfred-rs are vendored under vendor/ as path dependencies,
+    # so Dependabot will not touch them. See vendor/README.md.
     open-pull-requests-limit: 5
