@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **The binary is now signed with a Developer ID and notarised by Apple.** Without it,
+  a downloaded workflow is quarantined and macOS kills the binary on first use with
+  "Apple could not verify … is free of malware", offering *Move to Bin* as the default
+  button. Verified both ways: an ad-hoc signed binary is `rejected` by `spctl` and
+  blocked on execution, while the same binary signed and notarised is
+  `accepted — source=Notarized Developer ID` and runs silently.
+  - There is deliberately no `stapler staple` step: stapling only works on
+    `.app`/`.dmg`/`.pkg` bundles and fails with error 73 on a loose executable. It is
+    not needed, because Gatekeeper resolves the ticket with Apple online. The only
+    residual case is a user who is offline the very first time they use the workflow.
+  - Releases built without the signing secrets still succeed, with a warning, so forks
+    and pull requests are unaffected.
+
+### Changed
+- The workflow's *Created by* field is now just "Victor Rodrigues". The previous
+  "(originally by Hamid R. Ghadyani)" was truncated in Alfred's UI; the attribution
+  lives in the README and on the repository instead.
 
 ## [0.24.1] - 2026-08-16
 ### Fixed

@@ -17,3 +17,6 @@ run_exec.sh
 /res/workflow/pinion
 /res/workflow/alfred-pinboard-rs
 .DS_Store
+
+# Working notes — scoping, research, drafts. Deliberately not committed.
+/notes/

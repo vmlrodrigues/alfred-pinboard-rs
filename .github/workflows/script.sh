@@ -73,6 +73,50 @@ strip target/x86_64-apple-darwin/"$build_type"/pinion || true
 lipo -create -output pinion target/aarch64-apple-darwin/"$build_type"/pinion target/x86_64-apple-darwin/"$build_type"/pinion
 strip ./pinion || true
 chmod u+x ./pinion
+
+# Sign and notarise, so macOS does not refuse to run the binary.
+#
+# Without this, a downloaded workflow carries a quarantine flag and Gatekeeper
+# kills the binary on first use with "Apple could not verify … is free of
+# malware", offering "Move to Bin" as the default button. Verified: an ad-hoc
+# signed binary is `rejected` by spctl and blocked on execution; the same binary
+# signed with Developer ID and notarised is `accepted — source=Notarized
+# Developer ID` and runs.
+#
+# Note there is no `stapler staple` step. Stapling only works on .app/.dmg/.pkg
+# bundles — it fails with error 73 on a loose executable like ours. It is not
+# needed: Gatekeeper looks the ticket up with Apple online. The only cost is that
+# a user who is offline the very first time they use the workflow may still be
+# prompted.
+#
+# Skipped with a warning when the secrets are absent, so pull requests and forks
+# still build.
+if [[ -n "${MACOS_SIGN_IDENTITY:-}" ]]; then
+    echo "==> Signing with $MACOS_SIGN_IDENTITY"
+    codesign --force --sign "$MACOS_SIGN_IDENTITY" \
+             --options runtime --timestamp ./pinion
+    codesign --verify --strict --verbose=2 ./pinion
+
+    if [[ -n "${NOTARY_KEY_PATH:-}" ]]; then
+        echo "==> Notarising"
+        rm -f ./pinion-notarise.zip
+        ditto -c -k --keepParent ./pinion ./pinion-notarise.zip
+        xcrun notarytool submit ./pinion-notarise.zip \
+            --key "$NOTARY_KEY_PATH" \
+            --key-id "$NOTARY_KEY_ID" \
+            --issuer "$NOTARY_ISSUER" \
+            --wait --timeout 30m
+        rm -f ./pinion-notarise.zip
+        # Prove the ticket is live before we ship it, rather than trusting the
+        # submission result alone.
+        spctl -a -vv -t open --context context:primary-signature ./pinion
+    else
+        echo "WARNING: signed but NOT notarised — no notary credentials" >&2
+    fi
+else
+    echo "WARNING: no signing identity; shipping an unsigned binary." >&2
+    echo "         Users will hit Gatekeeper on first run." >&2
+fi
 if [[ "$RELEASE_COMMIT" == "true" ]]; then
   build_alfred_bundle "$src" "$stage"
 elif [[ -n "$PINBOARD_TOKEN" ]]; then
