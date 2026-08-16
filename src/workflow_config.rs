@@ -71,6 +71,10 @@ pub struct Config {
     /// Last time cache was updated
     #[serde(default = "get_epoch")]
     pub update_time: DateTime<Utc>,
+    /// Whether the one-time copy of these settings into Alfred's workflow
+    /// configuration sheet has already happened. See `migrate_to_alfred_config`.
+    #[serde(default)]
+    pub migrated_to_alfred_config: bool,
 
     /// Folder to store volatile data of the workflow
     workflow_data_dir: PathBuf,
@@ -95,6 +99,9 @@ impl Config {
             show_url_vs_tags: true,
             auth_token: String::new(),
             update_time: get_epoch(),
+            // A fresh install has nothing to migrate: Alfred's configuration
+            // sheet already holds the workflow's defaults.
+            migrated_to_alfred_config: true,
             workflow_data_dir: PathBuf::default(),
             workflow_cache_dir: PathBuf::default(),
         };
@@ -105,7 +112,38 @@ impl Config {
     pub fn setup() -> Result<Config, Box<dyn std::error::Error>> {
         debug!("Starting in setup");
         let (data_dir, cache_dir) = Config::get_workflow_dirs();
-        let config = Config::read(data_dir, cache_dir)?;
+        let mut config = Config::read(data_dir, cache_dir)?;
+
+        // An install that predates the move to Alfred's configuration sheet has
+        // its preferences only in settings.json. Push them into the sheet before
+        // reading the environment, otherwise this run — and every run after it —
+        // would see the workflow's defaults instead of the user's choices.
+        if !config.migrated_to_alfred_config {
+            match config.migrate_to_alfred_config() {
+                Ok(()) => {
+                    info!("migrated settings into Alfred's workflow configuration");
+                    config.migrated_to_alfred_config = true;
+                    if let Err(e) = config.save() {
+                        // Not fatal: we simply try again next time.
+                        error!(
+                            "couldn't record config migration: {}",
+                            crate::redact_token(&e.to_string())
+                        );
+                    }
+                }
+                Err(e) => {
+                    error!(
+                        "couldn't migrate settings into Alfred's configuration: {}",
+                        crate::redact_token(&e.to_string())
+                    );
+                }
+            }
+            // Either way this run keeps using the stored values: the environment
+            // this process was launched with predates the change.
+            return Ok(config);
+        }
+
+        config.apply_env_overrides();
         Ok(config)
     }
 
@@ -156,6 +194,105 @@ impl Config {
         let dirs = Config::get_workflow_dirs();
         self.workflow_data_dir = dirs.0;
         self.workflow_cache_dir = dirs.1;
+    }
+
+    /// Overlay Alfred's workflow configuration on top of what was read from
+    /// `settings.json`.
+    ///
+    /// Alfred 5 keeps user-settable options in the workflow's configuration
+    /// sheet and hands them to every script as environment variables, so the
+    /// sheet is the source of truth for these ten. A variable that is missing
+    /// or unparseable leaves the stored value alone rather than snapping to a
+    /// default, so a malformed entry degrades instead of resetting preferences.
+    pub fn apply_env_overrides(&mut self) {
+        debug!("Starting in apply_env_overrides");
+        if let Some(v) = env_bool(cfg_env::TAG_ONLY_SEARCH) {
+            self.tag_only_search = v;
+        }
+        if let Some(v) = env_bool(cfg_env::FUZZY_SEARCH) {
+            self.fuzzy_search = v;
+        }
+        // The sheet asks "share new bookmarks?", which is the inverse of how
+        // this is stored. Keep the question positive for the user and flip here.
+        if let Some(v) = env_bool(cfg_env::SHARED_NEW_PIN) {
+            self.private_new_pin = !v;
+        }
+        if let Some(v) = env_bool(cfg_env::TOREAD_NEW_PIN) {
+            self.toread_new_pin = v;
+        }
+        if let Some(v) = env_bool(cfg_env::SUGGEST_TAGS) {
+            self.suggest_tags = v;
+        }
+        if let Some(v) = env_bool(cfg_env::PAGE_IS_BOOKMARKED) {
+            self.page_is_bookmarked = v;
+        }
+        if let Some(v) = env_bool(cfg_env::SHOW_URL_VS_TAGS) {
+            self.show_url_vs_tags = v;
+        }
+        if let Some(v) = env_bool(cfg_env::AUTO_UPDATE_CACHE) {
+            self.auto_update_cache = v;
+        }
+        if let Some(v) = env_count(cfg_env::PINS_TO_SHOW) {
+            self.pins_to_show = v;
+        }
+        if let Some(v) = env_count(cfg_env::TAGS_TO_SHOW) {
+            self.tags_to_show = v;
+        }
+    }
+
+    /// Copy the settings that used to live in `settings.json` into Alfred's
+    /// workflow configuration sheet, exactly once.
+    ///
+    /// Before 0.19.0 this binary owned these options and `pset` wrote them to
+    /// `settings.json`. They now live in Alfred's configuration sheet, which on
+    /// upgrade starts out holding the workflow's *defaults* — so without this
+    /// step an existing user's preferences would silently reset the first time
+    /// they used the workflow after updating.
+    ///
+    /// Failure is not fatal: the stored values still drive this run, and the
+    /// flag is only recorded when the copy actually succeeded, so it is retried
+    /// next time.
+    fn migrate_to_alfred_config(&self) -> Result<(), Box<dyn std::error::Error>> {
+        use std::process::Command;
+        debug!("Starting in migrate_to_alfred_config");
+
+        let bundle_id = std::env::var("alfred_workflow_bundleid")
+            .map_err(|_| AlfredError::ConfigFileErr)
+            .map_err(Box::new)?;
+
+        let settings: [(&str, String); 10] = [
+            (cfg_env::TAG_ONLY_SEARCH, bool_str(self.tag_only_search)),
+            (cfg_env::FUZZY_SEARCH, bool_str(self.fuzzy_search)),
+            // Stored inverted — see `apply_env_overrides`.
+            (cfg_env::SHARED_NEW_PIN, bool_str(!self.private_new_pin)),
+            (cfg_env::TOREAD_NEW_PIN, bool_str(self.toread_new_pin)),
+            (cfg_env::SUGGEST_TAGS, bool_str(self.suggest_tags)),
+            (
+                cfg_env::PAGE_IS_BOOKMARKED,
+                bool_str(self.page_is_bookmarked),
+            ),
+            (cfg_env::SHOW_URL_VS_TAGS, bool_str(self.show_url_vs_tags)),
+            (cfg_env::AUTO_UPDATE_CACHE, bool_str(self.auto_update_cache)),
+            (cfg_env::PINS_TO_SHOW, self.pins_to_show.to_string()),
+            (cfg_env::TAGS_TO_SHOW, self.tags_to_show.to_string()),
+        ];
+
+        // One osascript invocation for all ten: spawning it ten times would add
+        // a noticeable delay to the keystroke that happens to trigger this.
+        let mut script = String::from("tell application id \"com.runningwithcrayons.Alfred\"\n");
+        for (key, value) in &settings {
+            script.push_str(&format!(
+                "set configuration \"{key}\" to value \"{value}\" in workflow \"{bundle_id}\"\n"
+            ));
+        }
+        script.push_str("end tell");
+
+        let output = Command::new("osascript").arg("-e").arg(&script).output()?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            Err(Box::new(AlfredError::ConfigFileErr))
+        }
     }
 
     #[allow(dead_code)]
@@ -213,6 +350,57 @@ impl Config {
     }
 }
 
+/// Keys of the workflow-configuration entries Alfred exports to us as
+/// environment variables. These must match the `variable` of each entry in
+/// `userconfigurationconfig` in `res/workflow/info.plist`.
+pub(crate) mod cfg_env {
+    pub const PINS_TO_SHOW: &str = "pins_to_show";
+    pub const TAGS_TO_SHOW: &str = "tags_to_show";
+    pub const TAG_ONLY_SEARCH: &str = "tag_only_search";
+    pub const FUZZY_SEARCH: &str = "fuzzy_search";
+    pub const SHARED_NEW_PIN: &str = "shared_new_pin";
+    pub const TOREAD_NEW_PIN: &str = "toread_new_pin";
+    pub const SUGGEST_TAGS: &str = "suggest_tags";
+    pub const PAGE_IS_BOOKMARKED: &str = "page_is_bookmarked";
+    pub const SHOW_URL_VS_TAGS: &str = "show_url_vs_tags";
+    pub const AUTO_UPDATE_CACHE: &str = "auto_update_cache";
+}
+
+/// How a boolean is written into Alfred's configuration sheet. Alfred's own
+/// checkboxes use "1"/"0", so match that.
+fn bool_str(b: bool) -> String {
+    if b { "1" } else { "0" }.to_string()
+}
+
+/// Parse a checkbox value from Alfred's configuration sheet.
+///
+/// Alfred writes "1"/"0", but the sheet is user-editable and these values can
+/// also be set by hand or by AppleScript, so accept the obvious spellings.
+/// Anything else — including empty — returns `None` so the caller keeps the
+/// value it already had.
+pub(crate) fn parse_bool(s: &str) -> Option<bool> {
+    match s.trim().to_ascii_lowercase().as_str() {
+        "1" | "true" | "yes" | "on" => Some(true),
+        "0" | "false" | "no" | "off" => Some(false),
+        _ => None,
+    }
+}
+
+/// Parse a "how many rows to show" value. Zero is rejected rather than honoured:
+/// it would render an empty Alfred window that looks like a broken workflow, and
+/// is far more likely to be a mistake than an intent.
+pub(crate) fn parse_count(s: &str) -> Option<u8> {
+    s.trim().parse::<u8>().ok().filter(|n| *n > 0)
+}
+
+fn env_bool(key: &str) -> Option<bool> {
+    std::env::var(key).ok().as_deref().and_then(parse_bool)
+}
+
+fn env_count(key: &str) -> Option<u8> {
+    std::env::var(key).ok().as_deref().and_then(parse_count)
+}
+
 fn get_alfred_version() -> Version {
     debug!("Starting in get_alfred_version");
     let min_version = 2;
@@ -235,4 +423,56 @@ fn get_epoch() -> DateTime<Utc> {
     "1970-01-01T23:00:00Z"
         .parse::<DateTime<Utc>>()
         .expect("Couldn't create UTC epoch time")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{bool_str, parse_bool, parse_count};
+
+    #[test]
+    fn parses_alfreds_own_checkbox_values() {
+        assert_eq!(parse_bool("1"), Some(true));
+        assert_eq!(parse_bool("0"), Some(false));
+    }
+
+    #[test]
+    fn parses_hand_written_checkbox_values() {
+        for s in ["true", "TRUE", " yes ", "On"] {
+            assert_eq!(parse_bool(s), Some(true), "{s:?} should parse as true");
+        }
+        for s in ["false", "FALSE", " no ", "Off"] {
+            assert_eq!(parse_bool(s), Some(false), "{s:?} should parse as false");
+        }
+    }
+
+    /// An unparseable value must not be read as `false`, or a typo in the
+    /// configuration sheet would silently turn a setting off.
+    #[test]
+    fn rejects_unparseable_booleans_rather_than_defaulting() {
+        for s in ["", "  ", "maybe", "2", "y"] {
+            assert_eq!(parse_bool(s), None, "{s:?} should not parse");
+        }
+    }
+
+    #[test]
+    fn round_trips_booleans_through_alfreds_format() {
+        assert_eq!(parse_bool(&bool_str(true)), Some(true));
+        assert_eq!(parse_bool(&bool_str(false)), Some(false));
+    }
+
+    #[test]
+    fn parses_row_counts() {
+        assert_eq!(parse_count("10"), Some(10));
+        assert_eq!(parse_count(" 25 "), Some(25));
+        assert_eq!(parse_count("255"), Some(255));
+    }
+
+    /// Zero would render an empty Alfred window that reads as a broken
+    /// workflow, and out-of-range values must not wrap.
+    #[test]
+    fn rejects_zero_and_out_of_range_counts() {
+        for s in ["0", "256", "-1", "", "ten", "1.5"] {
+            assert_eq!(parse_count(s), None, "{s:?} should not parse");
+        }
+    }
 }

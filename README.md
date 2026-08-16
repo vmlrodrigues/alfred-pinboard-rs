@@ -178,7 +178,18 @@ Additionally, you can **Action** a tag item anywhere in this workflow and use th
 
 ## Settings<a name="config"></a>
 
-Configure the workflow by entering `pconf` in Alfred:
+Settings live in Alfred's own **workflow configuration** panel — open Alfred Preferences →
+Workflows → this workflow → **Configure Workflow**, and you get checkboxes and fields for
+everything below.
+
+You can still change any of them without leaving Alfred's search bar, using the `pset`
+keywords listed further down; they write straight into that same configuration panel.
+
+If you are upgrading from 0.18.x or earlier, your existing preferences are copied into the
+configuration panel automatically the first time you use the workflow. Your Pinboard token
+is not affected — it stays where it was and never goes into the panel.
+
+To review the current values, enter `pconf` in Alfred:
 
 ![Configuration list](./res/images/configuration.png)
 

@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-08-16
+### Added
+- Settings now appear in Alfred's native **workflow configuration** panel: eight
+  checkboxes and two number fields, instead of being reachable only through keywords.
+  The configuration sheet is the source of truth and is passed to the workflow as
+  environment variables.
+
+### Changed
+- The `pset` keywords all still work and are unchanged from a user's point of view, but
+  they now write into Alfred's configuration sheet rather than into the workflow's own
+  `settings.json`.
+- On the first run after upgrading, existing preferences are copied from `settings.json`
+  into the configuration sheet automatically. Without this an upgrade would have reset
+  everyone's settings to the workflow defaults, since the sheet starts out empty.
+  A value that Alfred does not supply, or that cannot be parsed, leaves the stored
+  setting untouched rather than falling back to a default.
+- The Pinboard API token deliberately does **not** move into the configuration sheet.
+  It stays in `settings.json`, out of anything that gets exported or synced with the
+  workflow.
+
 ## [0.18.2] - 2026-08-16
 ### Fixed
 - Opera Developer and Opera Beta are detected again. Both branches were dead, for two
@@ -234,7 +254,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...v0.19.0
 [0.18.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...v0.18.2
 [0.18.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.17.2...v0.18.0
