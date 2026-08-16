@@ -65,7 +65,7 @@
 				<key>modifiers</key>
 				<integer>524288</integer>
 				<key>modifiersubtext</key>
-				<string></string>
+				<string>Open on Pinboard's website</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -76,6 +76,26 @@
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A981B9B-5BEE-491E-A897-46DF38627688</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Copy the shown tags/URL to Clipboard</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A981B9B-5BEE-491E-A897-46DF38627688</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Copy Description to Clipboard</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -5280,7 +5300,7 @@ rename by iconmu from the Noun Project</string>
 		</dict>
 	</array>
 	<key>version</key>
-	<string>0.19.1</string>
+	<string>0.20.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/vmlrodrigues/alfred-pinboard-rs</string>
 </dict>

@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-08-16
+### Added
+- <kbd>⌘⏎</kbd> in search results copies whichever of the tags or URL is currently
+  shown under <kbd>⌘</kbd>, and <kbd>⌃⏎</kbd> copies the bookmark's extended note.
+  Both modifiers previously changed the subtitle but left <kbd>⏎</kbd> doing the same
+  thing as no modifier at all, so two bindings did nothing. Nothing was taken away:
+  <kbd>⌥⏎</kbd> and <kbd>⌘⌥⏎</kbd> behave exactly as before.
+- A bookmark with no extended note marks the <kbd>⌃</kbd> alternate invalid, so
+  <kbd>⌃⏎</kbd> does nothing instead of copying an empty string.
+
+### Fixed
+- The <kbd>⌃</kbd> alternate declared an `arg` that nothing consumed, because no
+  connection carried the Control modifier. It now feeds the clipboard.
+- Alfred's <kbd>⌥</kbd> route had no modifier subtext, so nothing hinted the modifier
+  existed. All modifier routes out of `ps` are now labelled.
+
 ## [0.19.1] - 2026-08-16
 ### Fixed
 - The "show URLs / show tags in search results" checkbox added in 0.19.0 was labelled
@@ -274,7 +290,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...v0.20.0
 [0.19.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...v0.19.0
 [0.18.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...v0.18.2

@@ -139,10 +139,15 @@ To show tags instead of URLs in the subtitles, use `pset url_tag`:
 
 ### Modifiers while searching
 
-- <kbd>Control ⌃</kbd> — show the selected bookmark's extended description
-- <kbd>Command ⌘</kbd> — show the selected bookmark's tags
+Hold a modifier to see more about the highlighted bookmark; press <kbd>Return ⏎</kbd>
+while still holding it to copy exactly what you are looking at.
+
+- <kbd>Command ⌘</kbd> — show the bookmark's tags, or its URL if you have subtitles set
+  to show tags. <kbd>⌘⏎</kbd> copies whichever is shown.
+- <kbd>Control ⌃</kbd> — show the bookmark's extended note. <kbd>⌃⏎</kbd> copies the note.
+  Bookmarks without a note simply do nothing.
 - <kbd>Option ⌥</kbd> + <kbd>Return ⏎</kbd> — open the bookmark on [Pinboard's website](https://pinboard.in)
-- <kbd>Command ⌘</kbd> + <kbd>Option ⌥</kbd> + <kbd>Return ⏎</kbd> — copy the bookmark's URL to the clipboard
+- <kbd>Command ⌘</kbd> + <kbd>Option ⌥</kbd> + <kbd>Return ⏎</kbd> — copy the bookmark's URL
 - <kbd>Shift ⇧</kbd> — **tap** to preview the bookmark without opening a browser 😎 ⤵︎
 
 ![Quick Look preview](./res/images/quicklook-preview.png)

@@ -139,17 +139,29 @@ fn process<'a>(
                             .subtitle(subtitle)
                             .arg(pin.url.as_ref())
                             .variable("tags", pin.tags.as_ref())
-                            .subtitle_mod(Modifier::Command, modifier_subtitle)
                             .quicklook_url(pin.url.as_ref())
                             .text_large_type(pin.title.as_ref())
                             .text_copy(pin.url.as_ref())
                             .icon_path("bookmarks.png")
-                            // Hold Control: Show extended description of bookmark.
+                            // Hold Command: show whichever of tags/URL is not already the
+                            // subtitle, and copy that same value on Return. What you are
+                            // looking at is what you get.
+                            .modifier(
+                                Modifier::Command,
+                                Some(modifier_subtitle),
+                                Some(modifier_subtitle),
+                                true,
+                                None,
+                            )
+                            // Hold Control: show the bookmark's extended note, and copy it
+                            // on Return. A bookmark with no note has nothing to copy, so
+                            // the item is marked invalid rather than copying an empty
+                            // string.
                             .modifier(
                                 Modifier::Control,
                                 pin.extended.clone(),
-                                Some(pin.url.as_ref()),
-                                true,
+                                pin.extended.clone(),
+                                pin.extended.as_ref().is_some_and(|e| !e.trim().is_empty()),
                                 None,
                             )
                             // Hold Option: Pressing Enter opens the bookmark on Pinboard
@@ -189,6 +201,72 @@ fn process<'a>(
                     })
                     .collect::<Vec<Item>>(),
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use alfred::{ItemBuilder, Modifier};
+
+    /// The `ps` results carry three modifier alternates. Alfred only honours a
+    /// modifier if the item declares it *and* the workflow routes it, so this
+    /// pins down the half we emit: each alternate must carry its own subtitle,
+    /// its own `arg` to be acted on, and the right `valid` flag.
+    fn item_json(extended: Option<&str>) -> serde_json::Value {
+        let item = ItemBuilder::new("Some bookmark")
+            .subtitle("https://example.com")
+            .arg("https://example.com")
+            .modifier(
+                Modifier::Command,
+                Some("tag1 tag2"),
+                Some("tag1 tag2"),
+                true,
+                None,
+            )
+            .modifier(
+                Modifier::Control,
+                extended,
+                extended,
+                extended.is_some_and(|e| !e.trim().is_empty()),
+                None,
+            )
+            .into_item();
+        // Go through the crate's own writer: that is the exact byte stream
+        // Alfred parses, so the test cannot pass on a shape Alfred never sees.
+        let mut buf = Vec::new();
+        alfred::json::write_items(&mut buf, &[item]).expect("items should serialise");
+        let v: serde_json::Value = serde_json::from_slice(&buf).expect("output should be JSON");
+        v["items"][0].clone()
+    }
+
+    #[test]
+    fn command_alternate_carries_its_own_subtitle_and_arg() {
+        let v = item_json(Some("a note"));
+        let cmd = &v["mods"]["cmd"];
+        assert_eq!(cmd["subtitle"], "tag1 tag2");
+        assert_eq!(cmd["arg"], "tag1 tag2");
+        assert_eq!(cmd["valid"], true);
+    }
+
+    #[test]
+    fn control_alternate_copies_the_note() {
+        let v = item_json(Some("a note"));
+        let ctrl = &v["mods"]["ctrl"];
+        assert_eq!(ctrl["subtitle"], "a note");
+        assert_eq!(ctrl["arg"], "a note");
+        assert_eq!(ctrl["valid"], true);
+    }
+
+    /// A bookmark with no note must not offer a Return that copies nothing.
+    #[test]
+    fn control_alternate_is_invalid_without_a_note() {
+        for empty in [None, Some(""), Some("   ")] {
+            let v = item_json(empty);
+            assert_eq!(
+                v["mods"]["ctrl"]["valid"], false,
+                "empty note {empty:?} should not be actionable"
+            );
         }
     }
 }
