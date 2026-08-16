@@ -8,8 +8,11 @@ on:
 
 name: alfred-workflow
 
+# Least privilege by default. Only the release job needs to write to the repo —
+# in particular the build job, which is the one holding the signing certificate,
+# cannot create releases or push anything.
 permissions:
-  contents: write
+  contents: read
 
 env:
   RELEASE_COMMIT: ${{ github.ref_type == 'tag' }}
@@ -22,7 +25,7 @@ jobs:
     outputs:
       istagged: ${{ steps.master_is_tagged.outputs.tagged }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
       - name: Check if commit is tagged
@@ -38,7 +41,7 @@ jobs:
     needs: check_if_tagged
     if: ${{ needs.check_if_tagged.outputs.istagged == 0 || github.ref_type == 'tag' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # Toolchain comes from rust-toolchain.toml — see that file for why.
       # The Apple targets are added here rather than in that file so the Linux
@@ -121,13 +124,19 @@ jobs:
       - name: Grow fat, test, and make alfredworkflow
         run: .github/workflows/script.sh
 
-      - name: Remove notary key from the runner
+      # Both run even on failure. The runner is destroyed afterwards regardless,
+      # but this keeps the credentials out of any step that follows — notably the
+      # third-party upload and release actions.
+      - name: Remove signing credentials from the runner
         if: ${{ always() }}
-        run: rm -f "$RUNNER_TEMP/notary.p8"
+        run: |
+          rm -f "$RUNNER_TEMP/notary.p8"
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
+          security list-keychain -d user -s login.keychain-db 2>/dev/null || true
 
       - name: Upload for release
         if: ${{ github.ref_type == 'tag' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: workflow-upload
           path: Pinion.alfredworkflow
@@ -137,11 +146,14 @@ jobs:
     runs-on: macos-latest
     needs: build_universal
     if: ${{ github.ref_type == 'tag' }}
+    # The only job that writes anything, and it never sees the signing key.
+    permissions:
+      contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: workflow-upload
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: Pinion.alfredworkflow

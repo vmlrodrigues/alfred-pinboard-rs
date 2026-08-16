@@ -20,6 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     and pull requests are unaffected.
 
 ### Changed
+- Hardened the release pipeline, since it now holds a signing certificate:
+  - Every GitHub Action is pinned to an immutable commit SHA rather than a moving
+    tag. A tag can be repointed at new code — that is exactly how the
+    `tj-actions/changed-files` compromise worked — and an action in this workflow runs
+    on the same runner as the unlocked signing keychain.
+  - Permissions are least-privilege per job. The default is now `contents: read`, and
+    only the release job gets `contents: write`. The build job, the one that holds the
+    certificate, can no longer write to the repository.
+  - Both the notary key and the signing keychain are destroyed in an `always()` step
+    that runs before the third-party upload and release actions.
 - The workflow's *Created by* field is now just "Victor Rodrigues". The previous
   "(originally by Hamid R. Ghadyani)" was truncated in Alfred's UI; the attribution
   lives in the README and on the repository instead.
