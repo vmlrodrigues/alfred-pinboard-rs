@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.25.0] - 2026-08-16
 ### Added
 - **The binary is now signed with a Developer ID and notarised by Apple.** Without it,
   a downloaded workflow is quarantined and macOS kills the binary on first use with
@@ -425,7 +427,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.24.1...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/vmlrodrigues/pinion/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/vmlrodrigues/pinion/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/vmlrodrigues/pinion/compare/v0.22.0...v0.23.0
