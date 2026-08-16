@@ -138,25 +138,14 @@ on run
 		set theText to item 2 of theResult
 		
 	else if theApplication is "Helium.app" and appIsRunning("Helium") then
-		try
-			tell application "System Events"
-				tell (first process whose name is "Helium")
-					set heliumWindow to front window
-					set theURL to value of attribute "AXDocument" of heliumWindow
-					if theURL is missing value then
-						set theURL to ""
-					else
-						set theURL to (theURL as text)
-					end if
-					set theText to name of heliumWindow
-					if theText is missing value then set theText to ""
-				end tell
-			end tell
-		on error
-			set theURL to ""
-			set theText to ""
-		end try
-		
+		set theResult to run script "tell application id \"net.imput.helium\"
+        set theText to title of active tab of first window
+        set theURL to get URL of active tab of first window
+        return {theURL, theText}
+        end tell"
+		set theURL to item 1 of theResult
+		set theText to item 2 of theResult
+
 	else if theApplication is "Orion.app" and appIsRunning("Orion") then
 		set theResult to run script "tell application id \"com.kagi.kagimacOS\"
         set theTab to current tab of first window

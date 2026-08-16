@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-08-16
+### Fixed
+- Helium now uses its native AppleScript dictionary (`net.imput.helium`) instead of
+  reading the accessibility tree. Helium is a Chromium fork and answers the same
+  `active tab of first window` as Chrome, so the previous approach was not only more
+  fragile but unnecessary. It required an Accessibility permission that macOS never
+  prompts for — without it Helium silently never worked, because the surrounding
+  `try` swallowed the permission error — and it returned the browser *window* title
+  rather than the tab title, so bookmarks saved from Helium had worse titles than
+  those from any other browser.
+
 ## [0.18.0] - 2026-08-16
 This is the first release from the maintained fork at
 [vmlrodrigues/alfred-pinboard-rs](https://github.com/vmlrodrigues/alfred-pinboard-rs).
@@ -214,7 +225,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.17.2...v0.18.0
 [0.17.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/tag/v0.17.2
 [0.17.1]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.17.1
