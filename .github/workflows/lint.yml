@@ -23,8 +23,10 @@ jobs:
       - name: Install pinned toolchain
         run: rustup show
 
+      # Scoped to this package on purpose: `--all` would also format and lint the
+      # crates under vendor/, which we deliberately keep close to upstream.
       - name: Run cargo fmt
-        run: cargo fmt --all -- --check
+        run: cargo fmt -p alfred-pinboard-rs -- --check
 
       # The gate: correctness lints and rustc's own warnings fail the build.
       # `pedantic` is allowed here and run separately below — a single
@@ -32,10 +34,10 @@ jobs:
       # `-D warnings` re-promotes anything at warn level no matter where the
       # flags are ordered.
       - name: Run clippy
-        run: cargo clippy --tests --workspace -- -Dclippy::all -D warnings -Aclippy::pedantic
+        run: cargo clippy -p alfred-pinboard-rs --tests -- -Dclippy::all -D warnings -Aclippy::pedantic
 
       # Advisory only. Pedantic is opinionated by design and its membership
       # grows every release, so it reports without ever failing the build.
       - name: Run pedantic clippy (advisory)
         continue-on-error: true
-        run: cargo clippy --tests --workspace -- -Wclippy::pedantic
+        run: cargo clippy -p alfred-pinboard-rs --tests -- -Wclippy::pedantic

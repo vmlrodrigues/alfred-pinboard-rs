@@ -17,9 +17,13 @@
 ---
 
 > **This is a maintained fork** of [spamwax/alfred-pinboard-rs](https://github.com/spamwax/alfred-pinboard-rs),
-> originally written by Hamid R. Ghadyani. Upstream's last release was in June 2023.
-> This fork adds Helium browser support, modernised CI, and fixes for a couple of
-> credential-handling bugs. Issues and pull requests are welcome here.
+> originally written by Hamid R. Ghadyani, whose last release was in June 2023.
+>
+> Relative to upstream this fork adds Helium browser support and Alfred 5's native
+> settings panel, fixes two ways the Pinboard API token could leak, repairs several
+> crashes and dead browser integrations, and rebuilds the CI so releases actually
+> publish. See the [changelog](CHANGELOG.md) for the detail. Issues and pull requests
+> are welcome here.
 
 Download the workflow with the button above, double-click it to install in Alfred, then
 follow [Setup](#installation--setup).
@@ -35,11 +39,13 @@ Pinboard is a fast, no-nonsense bookmarking service. This workflow lets you:
 - _**search**_ your bookmarks
   - Tap <kbd>Shift</kbd> to preview the selected item without opening a browser
   - Tap <kbd>Command+L</kbd> for a _Large Type_ view of the title
-  - Tap <kbd>Command</kbd> to show the item's _tags_
-  - Tap <kbd>Control</kbd> to show the item's extended notes/description
+  - Hold <kbd>Command</kbd> to show the item's _tags_, or <kbd>Control</kbd> for its
+    extended note — and press <kbd>Return</kbd> while holding either to copy what you
+    are looking at
 - Bookmark deletion and tag renaming, as Universal Actions
 - Automatic [updates](#misc) of the workflow itself
-- Plenty of options you can adjust (see [Settings](#config))
+- Settings in Alfred's own configuration panel, or from the search bar with `pset`
+  (see [Settings](#config))
 
 ### TL;DR
 
@@ -52,9 +58,9 @@ After the initial [setup](#installation--setup):
 ### Supported browsers
 
 Safari · Safari Technology Preview · Chrome · Chromium · Brave · Brave Beta · Brave
-Nightly · Microsoft Edge · Vivaldi · Opera · Arc · Orion · Helium ·
-Firefox _(see [known issues](#known-issues))_ · Firefox Developer Edition ·
-qutebrowser _(see [known issues](#known-issues))_
+Nightly · Microsoft Edge · Vivaldi · Opera · Opera Beta · Opera Developer · Arc ·
+Orion · Helium · Firefox _(see [known issues](#known-issues))_ ·
+Firefox Developer Edition · qutebrowser _(see [known issues](#known-issues))_
 
 ## Installation / Setup
 
@@ -283,12 +289,32 @@ It tries to show helpful errors when things go wrong:
 [Open an issue](https://github.com/vmlrodrigues/alfred-pinboard-rs/issues) — feedback and
 bug reports are welcome.
 
+## Building from source
+
+Requires Rust — the toolchain is pinned in [`rust-toolchain.toml`](rust-toolchain.toml),
+so `cargo build` will fetch the right version automatically.
+
+```bash
+cargo build --release
+```
+
+The two Pinboard/Alfred libraries this depends on, `rusty-pin` and `alfred-rs`, are
+vendored under [`vendor/`](vendor/README.md) rather than fetched from crates.io or git.
+Both are unmaintained upstream, and `rusty-pin` in particular is not published anywhere
+and had a `master` branch incompatible with this code — so any `cargo update` used to
+break the build. Vendoring makes the repository self-contained. See
+[vendor/README.md](vendor/README.md) for provenance and the handful of local changes.
+
+Releases are built by GitHub Actions on a pushed tag; see
+[`.github/workflows/macos-universal.yml`](.github/workflows/macos-universal.yml).
+
 ## Credits
 
 Originally created by [Hamid R. Ghadyani](https://github.com/spamwax) as
 [alfred-pinboard-rs](https://github.com/spamwax/alfred-pinboard-rs). Almost all of the
-workflow's design and implementation is his work; this fork exists to keep it maintained
-and released. Thank you for building it and open-sourcing it under MIT.
+workflow's design and implementation is his work, as are the `rusty-pin` and `alfred-rs`
+libraries vendored here; this fork exists to keep it maintained and released. Thank you
+for building it and open-sourcing it under MIT.
 
 ## License
 

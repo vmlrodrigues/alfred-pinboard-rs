@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-08-16
+### Security
+- **The dependency tree is now free of known advisories.** `atty`
+  (RUSTSEC-2021-0145, RUSTSEC-2024-0375) and `time` 0.1 (RUSTSEC-2020-0071, a
+  segfault) are both gone, joining `structopt` and `ansi_term` which went in 0.21.0.
+  `atty` arrived via `env_logger` 0.9 in two dependencies that were outside this
+  project's control until now; `time` 0.1 came from `chrono`'s default `oldtime`
+  feature and went with a bump to chrono 0.4.45.
+
+### Changed
+- **`rusty-pin` and `alfred-rs` are now vendored under `vendor/`** instead of being
+  fetched from git and crates.io. Both are unmaintained upstream. `rusty-pin` was the
+  project's biggest fragility: it is not on crates.io, has no other fork, and its
+  `master` is API-incompatible with this code, so any `cargo update` or a lost
+  `Cargo.lock` broke the build outright — and if that repository were renamed or
+  deleted, the build would simply stop working. There is now no git dependency and no
+  revision to pin. See [vendor/README.md](vendor/README.md) for provenance, licences
+  and the local changes.
+- Lint and format steps are scoped to this package rather than `--all`/`--workspace`,
+  so the vendored crates are not held to this project's formatting and lint rules.
+- README refreshed: the fork summary, the search modifiers, the settings description
+  and the browser list were all out of date, and there is now a section on building
+  from source.
+
 ## [0.21.0] - 2026-08-16
 ### Changed
 - Replaced `structopt` with `clap` 4. `structopt` has been in maintenance mode since
@@ -306,7 +330,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...v0.20.0
 [0.19.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...v0.19.1

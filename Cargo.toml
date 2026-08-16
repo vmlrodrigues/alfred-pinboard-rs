@@ -1,6 +1,6 @@
 [package]
 name = "alfred-pinboard-rs"
-version = "0.21.0"
+version = "0.22.0"
 authors = [ "Hamid Ghadyani <hamid@hamid.cc>", "Victor Rodrigues",]
 edition = "2021"
 description = "Alfred workflow for Pinboard.in bookmarks, written in Rust."
@@ -21,12 +21,17 @@ env_logger = "0.10"
 
 [features]
 
+# Both of these are vendored under vendor/ rather than pulled from crates.io or
+# git. Upstream has been dormant since 2023, and as external dependencies they
+# were the project's biggest fragility: rusty-pin is not on crates.io, has no
+# other fork, and its master branch is API-incompatible with this code, so any
+# `cargo update` broke the build. Vendoring also let us drop `atty` from the
+# tree. See vendor/README.md.
 [dependencies.alfred-rs]
-version = "0.7"
+path = "vendor/alfred-rs"
 
 [dependencies.rusty-pin]
-git = "https://github.com/vmlrodrigues/rusty-pin"
-rev = "2681a76009386aac5613e6d842d085afa1af6149"
+path = "vendor/rusty-pin"
 
 [dependencies.chrono]
 version = "0.4"
