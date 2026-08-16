@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-08-16
+### Fixed
+- The "show URLs / show tags in search results" checkbox added in 0.19.0 was labelled
+  backwards. The stored flag is named `show_url_vs_tags`, but `true` actually means
+  *show tags* — so the checkbox is now labelled "Show tags in results" and matches
+  what it does. Behaviour is unchanged; only the label was wrong.
+- Corrected "Post all new bookmarksas as public" in the `pset shared` list.
+
+### Changed
+- The eight `pset` pickers now emit Alfred's JSON format instead of the Alfred 2-era
+  XML they had used since 2018. That format is long deprecated and structurally could
+  not carry modifier alternates, variables or typed icons, so this unblocks those.
+  Every title, subtitle, icon and argument is unchanged.
+- Those pickers no longer set `uid`, so the two choices always appear in the same
+  order. Previously Alfred reordered them by how often each was picked, which makes a
+  two-item toggle move under the cursor. The old values were inconsistent anyway
+  (`1`/`2`, `1`/`10`, empty, and in one case the leftovers `tagonly`/`des`).
+- Dropped the `autocomplete` values from those pickers. They were copy-paste noise
+  ("Yes"/"No") and tab-completing a toggle to the literal text "Yes" served no purpose.
+
 ## [0.19.0] - 2026-08-16
 ### Added
 - Settings now appear in Alfred's native **workflow configuration** panel: eight
@@ -254,7 +274,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...HEAD
+[0.19.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...v0.19.0
 [0.18.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...v0.18.2
 [0.18.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...v0.18.1
