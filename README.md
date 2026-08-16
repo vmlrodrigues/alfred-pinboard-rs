@@ -219,6 +219,12 @@ write into that same panel:
 Each `pset` toggle offers an explicit *Enable* / *Disable* choice rather than flipping
 blindly, so you can always see the current intent before committing to it.
 
+One setting has no `pset` keyword and lives only in the configuration panel:
+
+- **Notify on successful post** — off by default. Posting a bookmark is silent unless
+  something goes wrong; failures always notify. Turn it on if you would rather be told
+  every time, which is the behaviour older versions had.
+
 `pconf` lists every setting with its current value.
 
 **Upgrading from 0.18.x or earlier:** your existing preferences are copied into the

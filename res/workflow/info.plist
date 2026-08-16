@@ -1383,7 +1383,12 @@ echo "$ret"</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>title=$(echo "$1" | sed -n '1p' | cut -d ' ' -f 3-)
+				<string># Only announce a *successful* post when the user has asked for it.
+# notify_on_post comes from the workflow's configuration. The notification
+# downstream is set to "only show if query populated", so echoing nothing
+# suppresses it entirely. Failures travel a different path and always notify.
+[ "$notify_on_post" = "1" ] || exit 0
+title=$(echo "$1" | sed -n '1p' | cut -d ' ' -f 3-)
 echo "Posted: $title"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -1571,7 +1576,12 @@ apr_execution_counter=$apr_execution_counter ./pinion list -t "$1"</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>title=$(echo "$1" | sed -n '2p')
+				<string># Only announce a *successful* post when the user has asked for it.
+# notify_on_post comes from the workflow's configuration. The notification
+# downstream is set to "only show if query populated", so echoing nothing
+# suppresses it entirely. Failures travel a different path and always notify.
+[ "$notify_on_post" = "1" ] || exit 0
+title=$(echo "$1" | sed -n '2p')
 [ ! -z "$title" ] &amp;&amp; echo "$title"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -1956,7 +1966,7 @@ fi</string>
 				<integer>102</integer>
 				<key>script</key>
 				<string># remove old downloads
-rm -rf "$alfred_workflow_cache/latest_release_Rusty_Pin.alfredworkflow"
+rm -rf "$alfred_workflow_cache/latest_release_Pinion.alfredworkflow"
 
 # download &amp; install
 ret=$(./pinion self -d)
@@ -5283,6 +5293,25 @@ rename by iconmu from the Noun Project</string>
 			<key>config</key>
 			<dict>
 				<key>default</key>
+				<false/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string>Enabled</string>
+			</dict>
+			<key>description</key>
+			<string>Show a notification when a bookmark posts successfully. Failures are always reported, whatever this is set to.</string>
+			<key>label</key>
+			<string>Notify on successful post</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>notify_on_post</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
 				<true/>
 				<key>required</key>
 				<false/>
@@ -5342,7 +5371,7 @@ rename by iconmu from the Noun Project</string>
 		</dict>
 	</array>
 	<key>version</key>
-	<string>0.25.1</string>
+	<string>0.26.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/vmlrodrigues/pinion</string>
 </dict>

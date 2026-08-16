@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-08-16
+### Added
+- **Posting a bookmark is now silent unless it fails.** It previously fired *two*
+  notifications every time — "Posted: <title>" and then "Updated cache files!" — which
+  was enough of an irritation to make notifications worth switching off entirely,
+  hiding the failures that actually matter. A new **Notify on successful post**
+  checkbox in the workflow's configuration restores the old behaviour; it is off by
+  default. Failures notify regardless of the setting.
+
+### Fixed
+- The self-update cleanup still deleted `latest_release_Rusty_Pin.alfredworkflow`, a
+  filename left behind by the rename, so stale downloads accumulated in the cache
+  directory instead of being removed.
+
 ## [0.25.1] - 2026-08-16
 ### Fixed
 - `pa` now confirms straight away that the token was saved. The
@@ -436,7 +450,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.25.1...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.26.0...HEAD
+[0.26.0]: https://github.com/vmlrodrigues/pinion/compare/v0.25.1...v0.26.0
 [0.25.1]: https://github.com/vmlrodrigues/pinion/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/vmlrodrigues/pinion/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...v0.24.1
