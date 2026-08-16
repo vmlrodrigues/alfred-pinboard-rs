@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-08-16
+### Fixed
+- The 0.24.0 release bundle contained a stale 4.4 MB binary and a nested 3.1 MB copy of
+  an older `.alfredworkflow`. Renaming the project changed the `.gitignore` patterns that
+  had been keeping those two build artefacts untracked, so they were committed and then
+  legitimately packaged. They are removed, the ignore rules now cover every name the
+  binary has had, and the packaging step fails outright if it finds a nested bundle or
+  any executable other than `pinion`.
+
 ## [0.24.0] - 2026-08-16
 ### Changed
 - **The workflow is now called Pinion.** A pinion is the small gear that drives a larger
@@ -388,7 +397,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.24.1...HEAD
+[0.24.1]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/vmlrodrigues/pinion/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/vmlrodrigues/pinion/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/vmlrodrigues/pinion/compare/v0.21.0...v0.22.0

@@ -1,6 +1,6 @@
 [package]
 name = "pinion"
-version = "0.24.0"
+version = "0.24.1"
 authors = [ "Hamid Ghadyani <hamid@hamid.cc>", "Victor Rodrigues",]
 edition = "2021"
 description = "Alfred workflow for Pinboard.in bookmarks, written in Rust."

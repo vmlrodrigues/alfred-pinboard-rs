@@ -7,10 +7,13 @@ auth_token.txt
 build.log
 build_*.log
 # Release bundles, whatever they are named
-Pinion*.alfredworkflow
+*.alfredworkflow
 Cargo.toml.back
 run_exec.sh
-# The built binary, staged here by a local run of create_alfred_workflow.sh.
-# Anchored so it cannot accidentally match a directory elsewhere in the tree.
+# Build artefacts staged into res/workflow by a local run of
+# create_alfred_workflow.sh. Listed by every name the binary has ever had:
+# renaming the project once turned a name-specific pattern into a hole, and a
+# 4.4 MB binary plus a nested 3.1 MB bundle went out in a release because of it.
 /res/workflow/pinion
+/res/workflow/alfred-pinboard-rs
 .DS_Store

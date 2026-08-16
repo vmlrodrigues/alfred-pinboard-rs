@@ -25,6 +25,23 @@ build_alfred_bundle() {
         cp "$src/$f" "$stage"
     done
 
+    # Guard the two ways junk has actually got into a release. Tracking what git
+    # tracks is only as good as .gitignore, and renaming the project once turned a
+    # name-specific ignore pattern into a hole: a stale 4.4 MB binary and a 3.1 MB
+    # bundle nested inside the new one both shipped. Fail loudly instead.
+    nested=$(find "$stage" -name '*.alfredworkflow' | wc -l | tr -d ' ')
+    if [ "$nested" -ne 0 ]; then
+        echo "ERROR: a .alfredworkflow is nested inside the bundle" >&2
+        find "$stage" -name '*.alfredworkflow' >&2
+        exit 1
+    fi
+    strays=$(find "$stage" -type f ! -name pinion -exec file {} + | grep -c 'Mach-O' || true)
+    if [ "$strays" -ne 0 ]; then
+        echo "ERROR: unexpected executable(s) in the bundle besides ./pinion" >&2
+        find "$stage" -type f ! -name pinion -exec file {} + | grep 'Mach-O' >&2
+        exit 1
+    fi
+
     # echo "Creating the workflow bundle..."
     cd "$stage" || exit
     rm -f Pinion.alfredworkflow
