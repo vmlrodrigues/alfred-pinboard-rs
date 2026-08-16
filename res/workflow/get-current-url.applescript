@@ -45,7 +45,7 @@ on run
 		set theURL to item 1 of theResult
 		set theText to item 2 of theResult
 		
-	else if theApplication is "Opera Developer.app" and appIsRunning("Opera") then
+	else if theApplication is "Opera Developer.app" and appIsRunning("Opera Developer") then
 		set theResult to run script "tell application id \"com.operasoftware.OperaDeveloper\"
         set theText to title of active tab of first window
         set theURL to get URL of active tab of first window
@@ -54,7 +54,7 @@ on run
 		set theURL to item 1 of theResult
 		set theText to item 2 of theResult
 		
-	else if theApplication is "Opera Beta.pp" and appIsRunning("Opera") then
+	else if theApplication is "Opera Beta.app" and appIsRunning("Opera Beta") then
 		set theResult to run script "tell application id \"com.operasoftware.OperaNext\"
         set theText to title of active tab of first window
         set theURL to get URL of active tab of first window

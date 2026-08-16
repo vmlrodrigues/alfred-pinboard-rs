@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.2] - 2026-08-16
+### Fixed
+- Opera Developer and Opera Beta are detected again. Both branches were dead, for two
+  independent reasons: `Opera Beta` was matched against the string `"Opera Beta.pp"`,
+  missing the `a` in `.app`, and both branches asked `appIsRunning("Opera")` while the
+  running processes are named `Opera Developer` and `Opera Beta`. AppleScript's list
+  `contains` is exact membership rather than a substring test, so neither could ever
+  match. Regular Opera was unaffected.
+
 ## [0.18.1] - 2026-08-16
 ### Fixed
 - Helium now uses its native AppleScript dictionary (`net.imput.helium`) instead of
@@ -225,7 +234,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...HEAD
+[0.18.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...v0.18.2
 [0.18.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.17.2...v0.18.0
 [0.17.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/tag/v0.17.2
