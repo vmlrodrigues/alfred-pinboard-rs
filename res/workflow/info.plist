@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>cc.hamid.alfred-pinboard-rs</string>
+	<string>com.victorrodrigues.pinion</string>
 	<key>category</key>
 	<string>Productivity</string>
 	<key>connections</key>
@@ -1289,11 +1289,11 @@
 	<key>createdby</key>
 	<string>Victor Rodrigues (originally by Hamid R. Ghadyani)</string>
 	<key>description</key>
-	<string>Add &amp; search your Pinboard's bookmarks.</string>
+	<string>Pin, search and preview your Pinboard bookmarks.</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Rusty Pin</string>
+	<string>Pinion</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -1306,7 +1306,7 @@
 				<key>script</key>
 				<string># $tags and $description env. variables are passed in as input from previous script filter.
 
-ret=$(./alfred-pinboard-rs post --tags "$tags" --description "$description")
+ret=$(./pinion post --tags "$tags" --description "$description")
 
 echo "$ret"</string>
 				<key>scriptargtype</key>
@@ -1437,7 +1437,7 @@ echo "Posted: $title"</string>
 
 [ "$toread" = "false" ] &amp;&amp; toread=true || toread=false
 
-ret=$(./alfred-pinboard-rs post --toread "$toread" --tags "$tags" --description "$description")
+ret=$(./pinion post --toread "$toread" --tags "$tags" --description "$description")
 if [ $? -ne 0 ]; then
     echo -n "$ret"
 else
@@ -1488,7 +1488,7 @@ fi</string>
 				<string>apr_execution_counter=$((apr_execution_counter + 1))
 
 
-apr_execution_counter=$apr_execution_counter ./alfred-pinboard-rs list -t "$1"</string>
+apr_execution_counter=$apr_execution_counter ./pinion list -t "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -1587,7 +1587,7 @@ apr_execution_counter=$apr_execution_counter ./alfred-pinboard-rs list -t "$1"</
 
 [ "$shared" = "false" ] &amp;&amp; shared=true || shared=false
 
-ret=$(./alfred-pinboard-rs post --shared "$shared" --tags "$tags" --description "$description")
+ret=$(./pinion post --shared "$shared" --tags "$tags" --description "$description")
 if [ $? -ne 0 ]; then
     echo -n "$ret"
 else
@@ -1658,7 +1658,7 @@ rename by iconmu from the Noun Project</string>
 [ "$shared" = "false" ] &amp;&amp; shared=true || shared=false
 [ "$toread" = "false" ] &amp;&amp; toread=true || toread=false
 
-ret=$(./alfred-pinboard-rs post --shared "$shared" --toread "$toread" --tags "$tags" --description "$description")
+ret=$(./pinion post --shared "$shared" --toread "$toread" --tags "$tags" --description "$description")
 if [ $? -ne 0 ]; then
     echo -n "$ret"
 else
@@ -1947,7 +1947,7 @@ fi</string>
 rm -rf "$alfred_workflow_cache/latest_release_Rusty_Pin.alfredworkflow"
 
 # download &amp; install
-ret=$(./alfred-pinboard-rs self -d)
+ret=$(./pinion self -d)
 echo $ret</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -1993,11 +1993,11 @@ echo $ret</string>
 				<key>script</key>
 				<string>#set -o noglob
 #echo "$1" &gt; ~/foo.txt
-#./alfred-pinboard-rs search $1
+#./pinion search $1
 #set +o noglob
 
 set -o noglob
-./alfred-pinboard-rs search {query}
+./pinion search {query}
 
 set +o noglob</string>
 				<key>scriptargtype</key>
@@ -2141,7 +2141,7 @@ set +o noglob</string>
 				<key>runningsubtext</key>
 				<string>Checking...</string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs self -c
+				<string>./pinion self -c
 </string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -2273,7 +2273,7 @@ fi</string>
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs search --exact-tag "$selected_tag"</string>
+				<string>./pinion search --exact-tag "$selected_tag"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -2375,7 +2375,7 @@ fi</string>
 				<key>runningsubtext</key>
 				<string>Fetching tags...</string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs list --suggest false --no-existing-page -t "$1"</string>
+				<string>./pinion list --suggest false --no-existing-page -t "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -2476,7 +2476,7 @@ fi</string>
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs delete</string>
+				<string>./pinion delete</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -2566,7 +2566,7 @@ fi</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>./alfred-pinboard-rs delete -u $1</string>
+				<string>./pinion delete -u $1</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -2734,7 +2734,7 @@ fi</string>
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>ret=$(./alfred-pinboard-rs update)
+				<string>ret=$(./pinion update)
 echo $ret</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
@@ -2759,7 +2759,7 @@ echo $ret</string>
 				<integer>127</integer>
 				<key>script</key>
 				<string># set the auth token in config.json
-if ! ./alfred-pinboard-rs config --authorization $1; then
+if ! ./pinion config --authorization $1; then
     echo "Couldn't set user credentials!!!"
 else
     echo "Successfully set user credentials."
@@ -2941,7 +2941,7 @@ fi</string>
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs config -d
+				<string>./pinion config -d
 </string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
@@ -3024,7 +3024,7 @@ end tell</string>
 				<key>runningsubtext</key>
 				<string>Fetching tags...</string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs --query-as-item list --no-existing-page --suggest false -t "$1"</string>
+				<string>./pinion --query-as-item list --no-existing-page --suggest false -t "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -3071,7 +3071,7 @@ end tell</string>
 				<key>runningsubtext</key>
 				<string>Fetching tags...</string>
 				<key>script</key>
-				<string>./alfred-pinboard-rs --query-as-item list --no-existing-page --suggest false -t "$1"</string>
+				<string>./pinion --query-as-item list --no-existing-page --suggest false -t "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -3134,7 +3134,7 @@ end tell</string>
 				<key>script</key>
 				<string>newtag=$1
 
-x=$(./alfred-pinboard-rs rename "$oldtag" "$newtag")
+x=$(./pinion rename "$oldtag" "$newtag")
 
 if [ $? -eq 0 ]; then
   echo {\"alfredworkflow\": { \
@@ -3613,7 +3613,7 @@ fi</string>
 				<key>text</key>
 				<string>{query}</string>
 				<key>title</key>
-				<string>Rusty Pinboard 👍</string>
+				<string>Pinion 📌</string>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.output.notification</string>
@@ -4233,7 +4233,7 @@ IFS=' '
 read -ra TAGS &lt;&lt;&lt; "$input"
 
 
-x=$(./alfred-pinboard-rs rename "${TAGS[0]}" "${TAGS[1]}")
+x=$(./pinion rename "${TAGS[0]}" "${TAGS[1]}")
 
 if [ $? -eq 0 ]; then
   echo {\"alfredworkflow\": { \
@@ -4325,11 +4325,11 @@ end run</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Manage your Pinboard bookmarks from Alfred.
-Set your Pinboard authentication token with `pa` before first use.
-Detailed instructions are available at https://github.com/vmlrodrigues/alfred-pinboard-rs
+	<string>Pinion manages your Pinboard bookmarks from Alfred.
+Set your Pinboard API token with `pa` before first use — it is kept in your macOS Keychain.
+Full instructions: https://github.com/vmlrodrigues/pinion
 
-A maintained fork of the original workflow by Hamid R. Ghadyani.</string>
+A maintained fork of alfred-pinboard-rs by Hamid R. Ghadyani.</string>
 	<key>uidata</key>
 	<dict>
 		<key>0016C9AE-9AF1-45C8-A89B-663CCA5FBF2C</key>
@@ -5300,8 +5300,8 @@ rename by iconmu from the Noun Project</string>
 		</dict>
 	</array>
 	<key>version</key>
-	<string>0.23.0</string>
+	<string>0.24.0</string>
 	<key>webaddress</key>
-	<string>https://github.com/vmlrodrigues/alfred-pinboard-rs</string>
+	<string>https://github.com/vmlrodrigues/pinion</string>
 </dict>
 </plist>

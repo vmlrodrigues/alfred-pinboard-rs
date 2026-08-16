@@ -93,16 +93,14 @@ impl Runner<'_, '_> {
                         .unwrap();
                     let old_version = self.updater.as_ref().unwrap().current_version();
                     Some(
-                        alfred::ItemBuilder::new(
-                            "New Version Is Available for Rusty Pin Workflow! 🎉",
-                        )
-                        .subtitle(format!(
-                            "Click to download & upgrade {old_version} ⟶ {new_version}"
-                        ))
-                        .icon_path("auto_update.png")
-                        .variable("workflow_update_ready", "1")
-                        .arg("update")
-                        .into_item(),
+                        alfred::ItemBuilder::new("New Version Is Available for Pinion! 🎉")
+                            .subtitle(format!(
+                                "Click to download & upgrade {old_version} ⟶ {new_version}"
+                            ))
+                            .icon_path("auto_update.png")
+                            .variable("workflow_update_ready", "1")
+                            .arg("update")
+                            .into_item(),
                     )
                 } else {
                     info!("Update UNAVAILABLE: You have the latest version of workflow!");

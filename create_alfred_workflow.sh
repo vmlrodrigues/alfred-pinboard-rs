@@ -21,11 +21,11 @@ if [ -z "$version_tag" ]; then
     exit
 fi
 
-alfred_pinboard_rs="/Volumes/manzel/hamid/src/learn/rust/alfred-pinboard-rs"
+pinion_dir="/Volumes/manzel/hamid/src/learn/rust/pinion"
 workflow_dir="$HOME/Documents/Alfred.alfredpreferences/workflows/user.workflow.7F236DA2-2C66-4C31-B1D5-7DFDCB7CA715"
-res_dir="$alfred_pinboard_rs/res/workflow"
+res_dir="$pinion_dir/res/workflow"
 
-cd "$alfred_pinboard_rs" || exit
+cd "$pinion_dir" || exit
 git checkout master || exit
 
 printf "\n-> %sCopying resoursces from Alfred's workflow dir...%s\n" "${CYAN}" "${NC}"
@@ -63,8 +63,8 @@ printf "\n-> %sBuilding new release...%s\n" "${CYAN}" "${NC}"
 cargo build > build.log 2>&1
 
 printf "\n-> %sCopying executable to workflow's folder...%s\n" "${CYAN}" "${NC}"
-strip target/release/alfred-pinboard-rs
-cp target/release/alfred-pinboard-rs "$res_dir"
+strip target/release/pinion
+cp target/release/pinion "$res_dir"
 
 printf "\n-> %sUpdating version in info.plist%s\n" "${CYAN}" "${NC}"
 # version_tag=$(git describe --tags --abbrev=0)
@@ -75,17 +75,17 @@ plutil -convert xml1 "$res_dir"/info.plist
 #cp "$res_dir"/info.plist "$workflow_dir" || exit
 
 printf "\n-> %sCreating the workflow bundle...%s\n" "${CYAN}" "${NC}"
-rm -f AlfredPinboardRust.alfredworkflow
+rm -f Pinion.alfredworkflow
 cd "$res_dir" || exit
-rm -f AlfredPinboardRust.alfredworkflow
+rm -f Pinion.alfredworkflow
 
-zip -r AlfredPinboardRust.alfredworkflow ./*
+zip -r Pinion.alfredworkflow ./*
 
 printf "\n-> %sMoving bundle to executable folder...%s\n" "${CYAN}" "${NC}"
-mv AlfredPinboardRust.alfredworkflow "$alfred_pinboard_rs"
-rm alfred-pinboard-rs
+mv Pinion.alfredworkflow "$pinion_dir"
+rm pinion
 
-cd "$alfred_pinboard_rs" || exit
+cd "$pinion_dir" || exit
 git add .github
 git add res/workflow
 git add Cargo.toml

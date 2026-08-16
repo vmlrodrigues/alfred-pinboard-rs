@@ -1,11 +1,11 @@
 [package]
-name = "alfred-pinboard-rs"
-version = "0.23.0"
+name = "pinion"
+version = "0.24.0"
 authors = [ "Hamid Ghadyani <hamid@hamid.cc>", "Victor Rodrigues",]
 edition = "2021"
 description = "Alfred workflow for Pinboard.in bookmarks, written in Rust."
 license = "MIT"
-repository = "https://github.com/vmlrodrigues/alfred-pinboard-rs"
+repository = "https://github.com/vmlrodrigues/pinion"
 
 [dependencies]
 alfred = "4.0.1"

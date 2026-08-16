@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-08-16
+### Changed
+- **The workflow is now called Pinion.** A pinion is the small gear that drives a larger
+  one; *to pinion* is to bind something so it cannot get away; and it is the outer set of
+  feathers on a bird's wing. It also contains *pin*. It was *Rusty Pin* upstream.
+- **New bundle id: `com.victorrodrigues.pinion`**, replacing `cc.hamid.alfred-pinboard-rs`.
+  This is normally something to avoid — Alfred keys a workflow's data, cache and settings
+  off the bundle id, so changing it orphans all three and registers a second copy. It is
+  done here only because there are no installs to preserve. **Anyone running an older
+  version should delete it from Alfred before installing this one**, then re-run `pa`;
+  the Keychain entry is keyed off the bundle id too.
+- The binary, crate and release asset are renamed to match: `pinion` and
+  `Pinion.alfredworkflow`. The permanent download link is now
+  `releases/latest/download/Pinion.alfredworkflow`.
+- The repository moved to `vmlrodrigues/pinion`. GitHub redirects the old URL, but the
+  self-updater points at the new one directly.
+- The debug log target followed the crate rename to `pinion`, so Alfred's debug panel
+  keeps showing output.
+
 ## [0.23.0] - 2026-08-16
 ### Security
 - **The Pinboard API token now lives in the macOS Keychain**, not in plaintext in
@@ -163,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.18.0] - 2026-08-16
 This is the first release from the maintained fork at
-[vmlrodrigues/alfred-pinboard-rs](https://github.com/vmlrodrigues/alfred-pinboard-rs).
+[vmlrodrigues/alfred-pinboard-rs](https://github.com/vmlrodrigues/pinion).
 
 ### Security
 - The Pinboard API token is no longer printed into Alfred's debug window. It is passed as
@@ -369,17 +388,18 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.23.0...HEAD
-[0.23.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.22.0...v0.23.0
-[0.22.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.21.0...v0.22.0
-[0.21.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...v0.21.0
-[0.20.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...v0.20.0
-[0.19.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...v0.19.1
-[0.19.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...v0.19.0
-[0.18.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.1...v0.18.2
-[0.18.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...v0.18.1
-[0.18.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.17.2...v0.18.0
-[0.17.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/tag/v0.17.2
+[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/vmlrodrigues/pinion/compare/v0.23.0...v0.24.0
+[0.23.0]: https://github.com/vmlrodrigues/pinion/compare/v0.22.0...v0.23.0
+[0.22.0]: https://github.com/vmlrodrigues/pinion/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/vmlrodrigues/pinion/compare/v0.20.0...v0.21.0
+[0.20.0]: https://github.com/vmlrodrigues/pinion/compare/v0.19.1...v0.20.0
+[0.19.1]: https://github.com/vmlrodrigues/pinion/compare/v0.19.0...v0.19.1
+[0.19.0]: https://github.com/vmlrodrigues/pinion/compare/v0.18.2...v0.19.0
+[0.18.2]: https://github.com/vmlrodrigues/pinion/compare/v0.18.1...v0.18.2
+[0.18.1]: https://github.com/vmlrodrigues/pinion/compare/v0.18.0...v0.18.1
+[0.18.0]: https://github.com/vmlrodrigues/pinion/compare/v0.17.2...v0.18.0
+[0.17.2]: https://github.com/vmlrodrigues/pinion/releases/tag/v0.17.2
 [0.17.1]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.17.1
 [0.17.0]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.17.0
 [0.16.12]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.12

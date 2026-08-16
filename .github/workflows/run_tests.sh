@@ -14,9 +14,9 @@ run_tests() {
     export alfred_version="4.5.1"
     export alfred_workflow_version=0.16.0
     export alfred_workflow_uid=hamid63
-    export alfred_workflow_name="RustyPin"
-    export alfred_workflow_bundleid=cc.hamid.alfred-pinboard-rs
-    workflow_dir="$working_dir/.config/alfred-pinboard-rs"
+    export alfred_workflow_name="Pinion"
+    export alfred_workflow_bundleid=com.victorrodrigues.pinion
+    workflow_dir="$working_dir/.config/pinion"
     mkdir -p "$workflow_dir"
     export alfred_workflow_data="$workflow_dir"
     export alfred_workflow_cache="$workflow_dir"

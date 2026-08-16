@@ -75,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: workflow-upload
-          path: AlfredPinboardRust.alfredworkflow
+          path: Pinion.alfredworkflow
 
   release_alfred:
     name: Release Workflow
@@ -89,4 +89,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: AlfredPinboardRust.alfredworkflow
+          files: Pinion.alfredworkflow

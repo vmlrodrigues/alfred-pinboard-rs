@@ -12,10 +12,10 @@ build_alfred_bundle() {
     test -f Cargo.lock || cargo generate-lockfile
 
     # TODO Update this to build the artifacts that matter to you
-    # cross rustc --bin alfred-pinboard-rs --target "$TARGET" --release -- -C lto
+    # cross rustc --bin pinion --target "$TARGET" --release -- -C lto
 
     # echo "Copying executable to workflow's folder..."
-    cp "alfred-pinboard-rs" "$stage"
+    cp "pinion" "$stage"
 
     # Ship exactly what git tracks under res/workflow. The old blanket
     # `cp res/workflow/*` also swept up whatever happened to be sitting in that
@@ -27,14 +27,14 @@ build_alfred_bundle() {
 
     # echo "Creating the workflow bundle..."
     cd "$stage" || exit
-    rm -f AlfredPinboardRust.alfredworkflow
+    rm -f Pinion.alfredworkflow
 
-    zip -r AlfredPinboardRust.alfredworkflow ./*
+    zip -r Pinion.alfredworkflow ./*
 
     # Deliberately unversioned: it makes
-    #   releases/latest/download/AlfredPinboardRust.alfredworkflow
+    #   releases/latest/download/Pinion.alfredworkflow
     # a permanent download link. The release tag already carries the version.
-    mv ./AlfredPinboardRust.alfredworkflow "$src"/AlfredPinboardRust.alfredworkflow
+    mv ./Pinion.alfredworkflow "$src"/Pinion.alfredworkflow
     cd "$src"
 
 }
@@ -48,18 +48,18 @@ if [[ "$RELEASE_COMMIT" == "true" ]]; then
 else
   build_type=debug
 fi
-ls -lh ./target/aarch64-apple-darwin/"$build_type"/alfred-pinboard-rs
-ls -lh ./target/x86_64-apple-darwin/"$build_type"/alfred-pinboard-rs
+ls -lh ./target/aarch64-apple-darwin/"$build_type"/pinion
+ls -lh ./target/x86_64-apple-darwin/"$build_type"/pinion
 
-strip target/aarch64-apple-darwin/"$build_type"/alfred-pinboard-rs || true
-strip target/x86_64-apple-darwin/"$build_type"/alfred-pinboard-rs || true
-lipo -create -output alfred-pinboard-rs target/aarch64-apple-darwin/"$build_type"/alfred-pinboard-rs target/x86_64-apple-darwin/"$build_type"/alfred-pinboard-rs
-strip ./alfred-pinboard-rs || true
-chmod u+x ./alfred-pinboard-rs
+strip target/aarch64-apple-darwin/"$build_type"/pinion || true
+strip target/x86_64-apple-darwin/"$build_type"/pinion || true
+lipo -create -output pinion target/aarch64-apple-darwin/"$build_type"/pinion target/x86_64-apple-darwin/"$build_type"/pinion
+strip ./pinion || true
+chmod u+x ./pinion
 if [[ "$RELEASE_COMMIT" == "true" ]]; then
   build_alfred_bundle "$src" "$stage"
 elif [[ -n "$PINBOARD_TOKEN" ]]; then
-  .github/workflows/run_tests.sh ./alfred-pinboard-rs "$PINBOARD_TOKEN"
+  .github/workflows/run_tests.sh ./pinion "$PINBOARD_TOKEN"
 else
   echo "PINBOARD_TOKEN not set; skipping API tests"
 fi

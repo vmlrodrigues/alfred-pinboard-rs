@@ -56,7 +56,7 @@ use crate::commands::config;
 // TODO: Add a command to search pins that have 'toread' enabled. <01-09-21, Hamid> //
 // TODO: We need to come up with actual meaningful tests and deploy them to CIs. <23-08-21, Hamid> //
 // TODO: parse Alfred preferences and get number of visible items?
-// TODO: running ./alfred-pinboard-rs update from command line panics (starting from
+// TODO: running ./pinion update from command line panics (starting from
 //       fetch_latest_release)
 // TODO: Make sure that we don't show any json-like error in macOS's notification (check issue#27)
 // TODO: add an option to disable/enable update checks
@@ -94,24 +94,21 @@ fn main() {
          - export alfred_workflow_data=$HOME/tmp/apr
          - export alfred_workflow_cache=$HOME/tmp/apr/
          - export alfred_workflow_uid=hamid63
-         - export alfred_workflow_name="Rusty Pin"
-         - export alfred_workflow_bundleid=cc.hamid.alfred-pinboard-rs
+         - export alfred_workflow_name="Pinion"
+         - export alfred_workflow_bundleid=com.victorrodrigues.pinion
          - export alfred_version=3.6
     */
     // env::set_var("alfred_workflow_data", "/Volumes/Home/hamid/tmp/rust");
     // env::set_var("alfred_workflow_cache", "/Volumes/Home/hamid/tmp/rust");
     // env::set_var("alfred_workflow_uid", "hamid63");
-    // env::set_var("alfred_workflow_name", "alfred-pinboard-rs");
+    // env::set_var("alfred_workflow_name", "Pinion");
     // env::set_var("alfred_version", "3.6");
-    // env::set_var("RUST_LOG", "rusty_pin=debug,alfred_pinboard_rs=debug");
+    // env::set_var("RUST_LOG", "rusty_pin=debug,pinion=debug");
     // If user has Alfred's debug panel open, print all debug info
     // by setting RUST_LOG environment variable.
     use env::var_os;
     if alfred::env::is_debug() {
-        env::set_var(
-            "RUST_LOG",
-            "rusty_pin=debug,alfred_rs=debug,alfred_pinboard_rs=debug",
-        );
+        env::set_var("RUST_LOG", "rusty_pin=debug,alfred_rs=debug,pinion=debug");
     }
     env_logger::init();
 
@@ -160,9 +157,9 @@ fn main() {
             process::exit(1);
         });
 
-        let mut updater = Updater::gh("vmlrodrigues/alfred-pinboard-rs").unwrap();
+        let mut updater = Updater::gh("vmlrodrigues/pinion").unwrap();
 
-        // If running ./alfred-pinboard-rs self -c, we have to make a network call
+        // If running ./pinion self -c, we have to make a network call
         // We do this by forcing the check interval to be zero
         if let SubCommand::SelfUpdate { check, .. } = opt.cmd {
             if check {

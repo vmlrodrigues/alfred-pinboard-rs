@@ -432,7 +432,7 @@ impl Config {
         let cache_dir = alfred::env::workflow_cache().unwrap_or_else(|| {
             let mut dir = home_dir().unwrap_or_else(|| PathBuf::from(""));
             dir.push(".cache");
-            dir.push("alfred-pinboard-rs");
+            dir.push("pinion");
             dir
         });
         debug!("cache_dir: {}", cache_dir.to_string_lossy());
@@ -444,7 +444,7 @@ impl Config {
         let data_dir = alfred::env::workflow_data().unwrap_or_else(|| {
             let mut dir = home_dir().unwrap_or_else(|| PathBuf::from(""));
             dir.push(".config");
-            dir.push("alfred-pinboard-rs");
+            dir.push("pinion");
             dir
         });
         debug!("data_dir: {}", data_dir.to_string_lossy());

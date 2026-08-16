@@ -1,15 +1,15 @@
 <div align="center">
   <img src="res/workflow/icon.png" width="128" height="128" alt="" />
-  <h1>Alfred Workflow for Pinboard</h1>
+  <h1>Pinion</h1>
   <p>Manage, post and preview your <a href="https://pinboard.in">Pinboard</a> bookmarks from <a href="https://www.alfredapp.com">Alfred</a>.</p>
 
-  [![Build](https://github.com/vmlrodrigues/alfred-pinboard-rs/actions/workflows/macos-universal.yml/badge.svg)](https://github.com/vmlrodrigues/alfred-pinboard-rs/actions/workflows/macos-universal.yml)
-  [![Clippy](https://github.com/vmlrodrigues/alfred-pinboard-rs/actions/workflows/lint.yml/badge.svg)](https://github.com/vmlrodrigues/alfred-pinboard-rs/actions/workflows/lint.yml)
-  [![Latest release](https://img.shields.io/github/v/release/vmlrodrigues/alfred-pinboard-rs?label=latest)](https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/latest)
+  [![Build](https://github.com/vmlrodrigues/pinion/actions/workflows/macos-universal.yml/badge.svg)](https://github.com/vmlrodrigues/pinion/actions/workflows/macos-universal.yml)
+  [![Clippy](https://github.com/vmlrodrigues/pinion/actions/workflows/lint.yml/badge.svg)](https://github.com/vmlrodrigues/pinion/actions/workflows/lint.yml)
+  [![Latest release](https://img.shields.io/github/v/release/vmlrodrigues/pinion?label=latest)](https://github.com/vmlrodrigues/pinion/releases/latest)
   ![Alfred](https://img.shields.io/badge/Alfred-5-blueviolet)
   [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-  <a href="https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/latest/download/AlfredPinboardRust.alfredworkflow">
+  <a href="https://github.com/vmlrodrigues/pinion/releases/latest/download/Pinion.alfredworkflow">
     <img src="https://img.shields.io/badge/Download_Workflow-007AFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download the workflow" height="40">
   </a>
 </div>
@@ -18,14 +18,31 @@
 
 > A fork of [spamwax/alfred-pinboard-rs](https://github.com/spamwax/alfred-pinboard-rs)
 > by Hamid R. Ghadyani, which has not had a release since June 2023. This one is kept
-> current: Helium support, the Alfred 5 settings panel, and assorted fixes. The
-> [changelog](CHANGELOG.md) has the details.
+> current: Helium support, the Alfred 5 settings panel, and assorted fixes. It was called
+> *Rusty Pin* upstream. The [changelog](CHANGELOG.md) has the details.
+
+## The name
+
+**Pinion** — for three reasons, all of them true at once.
+
+A **pinion** is the small gear that meshes with a larger one and drives it. That is the
+job here: a little thing you barely notice, turning a much bigger wheel. It is also
+quietly apt for something written in Rust, which is a language people reach for when they
+care about the machinery.
+
+To **pinion** something is to bind it, to hold it fast so it cannot get away. Which is
+what you are doing every time you save a bookmark you would otherwise lose.
+
+And a **pinion** is the outermost set of feathers on a bird's wing — the ones that
+actually do the flying.
+
+The word also just contains *pin*, which is the whole point.
 
 ## Setup
 
-Download the workflow with the button above and open it to install into Alfred.
+Download Pinion with the button above and open it to install into Alfred.
 
-Then authenticate once. This workflow only uses Pinboard's username/token method, so you
+Then authenticate once. Pinion only uses Pinboard's username/token method, so you
 never type your password. Get your token from
 [Pinboard's settings page](https://pinboard.in/settings/password) — it looks like
 `yourname:A1B2C3D4E5F6G7H8I9J0` — and give it to the `pa` keyword:
@@ -34,7 +51,7 @@ never type your password. Get your token from
 pa yourname:A1B2C3D4E5F6G7H8I9J0
 ```
 
-The workflow keeps a local cache of your bookmarks and tags, and by default refreshes it
+Pinion keeps a local cache of your bookmarks and tags, and by default refreshes it
 automatically after you post. To rebuild it by hand at any time, use `pu`.
 
 ### Where the token is kept
@@ -47,11 +64,11 @@ If you are upgrading from a version that stored it in `settings.json`, it is mov
 the Keychain the first time you use the workflow and the plaintext copy is removed. You
 do not need to do anything.
 
-To remove it entirely, delete the `pinboard-api-token` entry for this workflow in
+To remove it entirely, delete the `pinboard-api-token` entry for Pinion in
 Keychain Access, or:
 
 ```bash
-security delete-generic-password -s cc.hamid.alfred-pinboard-rs -a pinboard-api-token
+security delete-generic-password -s com.victorrodrigues.pinion -a pinboard-api-token
 ```
 
 ## Keywords
@@ -180,7 +197,7 @@ The *Rename Pinboard Tag* Universal Action does the same from anywhere in Alfred
 ## Settings
 
 Settings live in Alfred's own configuration panel — **Alfred Preferences → Workflows →
-this workflow → Configure Workflow** — which gives you checkboxes and fields for
+Pinion → Configure Workflow** — which gives you checkboxes and fields for
 everything below.
 
 You can also change any of them without leaving Alfred's search bar. The `pset` keywords
@@ -227,7 +244,7 @@ Firefox and qutebrowser have caveats — see below.
 ## Known issues
 
 **Firefox.** Firefox does not support being driven by AppleScript the way other browsers
-do, so the workflow falls back to synthesising keystrokes and reading the clipboard. With
+do, so Pinion falls back to synthesising keystrokes and reading the clipboard. With
 tag suggestions or "check if bookmarked" enabled, posting from Firefox is unreliable, and
 `pind` will not work while Firefox is frontmost. Installing
 [alfred-firefox](https://github.com/deanishe/alfred-firefox) works around this — you do
@@ -246,7 +263,7 @@ the last version in Alfred 4 format.
 
 ## Updates
 
-The workflow checks for a newer version of itself once every 24 hours, and only when you
+Pinion checks for a newer version of itself once every 24 hours, and only when you
 actually use one of its keywords — there is no background process. `pcheck` checks
 immediately.
 
@@ -271,7 +288,7 @@ Releases are built by GitHub Actions from a pushed tag — see
 
 ## Feedback
 
-[Open an issue](https://github.com/vmlrodrigues/alfred-pinboard-rs/issues).
+[Open an issue](https://github.com/vmlrodrigues/pinion/issues).
 
 ## Credits
 

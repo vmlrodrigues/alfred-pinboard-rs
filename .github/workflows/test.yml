@@ -29,4 +29,4 @@ jobs:
         run: cargo build
 
       - name: Run tests
-        run: .github/workflows/run_tests.sh ${{ github.workspace }}/target/debug/alfred-pinboard-rs
+        run: .github/workflows/run_tests.sh ${{ github.workspace }}/target/debug/pinion
