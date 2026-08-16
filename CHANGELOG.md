@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-08-16
+### Changed
+- Replaced `structopt` with `clap` 4. `structopt` has been in maintenance mode since
+  2022 (RUSTSEC-2022-0104) and pinned the tree to `clap` 2. Every flag, short, long,
+  default and conflict is unchanged — the command-line surface was diffed
+  subcommand-by-subcommand before and after, and all 18 invocations the workflow
+  actually makes were replayed against the new binary.
+
+### Security
+- Dropped `structopt` (RUSTSEC-2022-0104) and `ansi_term` (RUSTSEC-2021-0139) from the
+  dependency tree, along with `clap` 2, `textwrap`, `vec_map` and `proc-macro-error`.
+- `atty` (RUSTSEC-2021-0145, RUSTSEC-2024-0375) is **not** yet gone. It no longer
+  arrives through `structopt`, but `alfred-rs` 0.7.1 still depends on `env_logger` 0.9,
+  which depends on it. Removing it needs a change in `alfred-rs`, which is published on
+  crates.io by the original author and is not something this fork controls.
+
 ## [0.20.0] - 2026-08-16
 ### Added
 - <kbd>⌘⏎</kbd> in search results copies whichever of the tags or URL is currently
@@ -290,7 +306,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.21.0...HEAD
+[0.21.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...v0.20.0
 [0.19.1]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.2...v0.19.0

@@ -20,10 +20,6 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-#[macro_use]
-extern crate structopt;
-// extern crate structopt_derive;
-
 extern crate env_logger;
 
 #[macro_use]
@@ -39,8 +35,8 @@ use std::io;
 use std::process;
 
 use alfred_rs::Updater;
+use clap::Parser;
 use rusty_pin::Pinboard;
-use structopt::StructOpt;
 use thiserror::Error;
 
 mod cli;
@@ -115,7 +111,7 @@ fn main() {
     env_logger::init();
 
     debug!("Parsing input arguments.");
-    let opt: Opt = Opt::from_args();
+    let opt: Opt = Opt::parse();
 
     debug!("Looking for alfred_workflow_* env. vars");
     let env_flags = (
