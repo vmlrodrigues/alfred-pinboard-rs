@@ -20,8 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      # Toolchain comes from rust-toolchain.toml — see that file for why.
+      - name: Install pinned toolchain
+        run: rustup show
 
       - name: Build x86_64 (Debug)
         if: ${{ env.RELEASE_COMMIT != 'true' }}

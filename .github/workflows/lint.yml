@@ -16,11 +16,26 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Setup Rust linting tools
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt,clippy
+
+      # The toolchain comes from rust-toolchain.toml so that CI and a local
+      # checkout lint against the identical compiler. `rustup show` installs it
+      # and prints the resolved version into the log.
+      - name: Install pinned toolchain
+        run: rustup show
+
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
-      - name: Run full pedantic clippy lints
-        run: cargo clippy --tests --workspace -- -Dclippy::all -Dclippy::pedantic -D warnings
+
+      # The gate: correctness lints and rustc's own warnings fail the build.
+      # `pedantic` is allowed here and run separately below — a single
+      # invocation cannot both deny warnings and demote pedantic, because
+      # `-D warnings` re-promotes anything at warn level no matter where the
+      # flags are ordered.
+      - name: Run clippy
+        run: cargo clippy --tests --workspace -- -Dclippy::all -D warnings -Aclippy::pedantic
+
+      # Advisory only. Pedantic is opinionated by design and its membership
+      # grows every release, so it reports without ever failing the build.
+      - name: Run pedantic clippy (advisory)
+        continue-on-error: true
+        run: cargo clippy --tests --workspace -- -Wclippy::pedantic

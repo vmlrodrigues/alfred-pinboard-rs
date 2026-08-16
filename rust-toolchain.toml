@@ -1,0 +1,11 @@
+# Pinned deliberately. With a floating `stable`, each Rust release adds lints to
+# clippy's `pedantic` group and to rustc's own warnings, so a repo that is only
+# touched a few times a year comes back to a red pipeline for lints that did not
+# exist when the code was written — with no code change in between. Upstream hit
+# exactly this: a docs-only commit failed CI with 17 Rust lint errors.
+#
+# Cargo reads this file too, so a local `cargo clippy` matches CI exactly.
+# Bump it when you have appetite for the new lints, not on someone else's cadence.
+[toolchain]
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]
