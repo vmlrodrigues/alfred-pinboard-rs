@@ -150,7 +150,10 @@ fn process<'a>(
                                 Modifier::Command,
                                 Some(modifier_subtitle),
                                 Some(modifier_subtitle),
-                                true,
+                                // Pinboard allows untagged bookmarks, so this is "" whenever the
+                                // subtitle already shows the URL. Leaving it valid meant ⌘⏎ copied
+                                // an empty string over the clipboard.
+                                !modifier_subtitle.trim().is_empty(),
                                 None,
                             )
                             // Hold Control: show the bookmark's extended note, and copy it

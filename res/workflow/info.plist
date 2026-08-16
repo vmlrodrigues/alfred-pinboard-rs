@@ -5112,7 +5112,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Match tags and bookmarks fuzzily rather than on consecutive characters.</string>
@@ -5131,7 +5131,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>When posting, list Pinboard's popular tags for the current page. Adds about a second to the first keystroke.</string>
@@ -5150,7 +5150,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Mark new bookmarks as public. Leave off to keep them private.</string>
@@ -5169,7 +5169,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Mark new bookmarks as unread.</string>
@@ -5188,7 +5188,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Restrict searching to the tag field instead of title, URL and notes.</string>
@@ -5207,7 +5207,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Refresh the local cache automatically after posting a bookmark.</string>
@@ -5226,7 +5226,7 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
 			<string>Tell me when the page in my browser is already bookmarked.</string>
@@ -5245,10 +5245,10 @@ rename by iconmu from the Noun Project</string>
 				<key>required</key>
 				<false/>
 				<key>text</key>
-				<string></string>
+				<string>Enabled</string>
 			</dict>
 			<key>description</key>
-			<string>Show tags in search-result subtitles. Turn off to show URLs instead. (The stored flag is named show_url_vs_tags but true means tags — see search.rs.)</string>
+			<string>Show tags in search-result subtitles. Turn off to show URLs instead.</string>
 			<key>label</key>
 			<string>Show tags in results</string>
 			<key>type</key>
@@ -5300,7 +5300,7 @@ rename by iconmu from the Noun Project</string>
 		</dict>
 	</array>
 	<key>version</key>
-	<string>0.22.0</string>
+	<string>0.23.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/vmlrodrigues/alfred-pinboard-rs</string>
 </dict>

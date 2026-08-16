@@ -6,6 +6,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-08-16
+### Security
+- **The Pinboard API token now lives in the macOS Keychain**, not in plaintext in
+  `settings.json`. It is moved across automatically the first time you use the workflow
+  after upgrading, and the plaintext copy is deleted. The token is deliberately *not* in
+  Alfred's configuration panel: values there are carried along when a workflow is
+  exported or synced.
+- `redact_token` no longer deletes surrounding text, and no longer leaks. It scanned to
+  the next `&`, `)` or space and dropped everything in between, so a newline or `", `
+  after the token swallowed the following words of the error message. It now consumes
+  exactly the token and is case-insensitive.
+
+### Fixed
+- Typing a tag query containing non-breaking or thin spaces no longer discards the tags
+  already typed. The panic fix in 0.18.0 sliced to the *start* byte of a multi-byte
+  separator, so the slice failed and every earlier tag was silently dropped — a bookmark
+  could be posted with only the last tag.
+- <kbd>⌘⏎</kbd> on a bookmark with no tags no longer overwrites the clipboard with an
+  empty string.
+- **Firefox Developer Edition is detected again**, and can no longer bookmark the wrong
+  page. It was guarded by `appIsRunning("Firefox")` while the process is named after the
+  bundle; worse, with both Firefox editions running the guard passed but an inner check
+  failed, and the script then returned whatever happened to be on the clipboard as the
+  URL. The clipboard read is now inside the guard in both Firefox branches, so a miss
+  fails visibly instead of inventing a URL.
+- Settings you changed in the configuration panel before your first run after upgrading
+  are no longer overwritten by the migration.
+- A malformed token now shows an error in Alfred instead of an empty window.
+- A failed popular-tags fetch no longer leaves the previous page's suggestions in the
+  cache, where the next keystroke would offer them for a different URL.
+- Failures while writing the configuration sheet are reported as what they are, instead
+  of "Corrupted config file. Set API token again!".
+
+### Changed
+- New workflow icon.
+- README rewritten without screenshots. Functionality is shown as the commands you
+  actually type, with reference tables for keywords, modifiers and settings. Screenshots
+  went stale faster than they earned their place; `res/images/` (10 MB) is deleted.
+
 ## [0.22.0] - 2026-08-16
 ### Security
 - **The dependency tree is now free of known advisories.** `atty`
@@ -330,7 +369,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.22.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.19.1...v0.20.0

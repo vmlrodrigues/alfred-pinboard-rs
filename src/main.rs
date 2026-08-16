@@ -41,6 +41,7 @@ use thiserror::Error;
 
 mod cli;
 mod commands;
+mod keychain;
 mod workflow_config;
 
 use crate::cli::{Opt, SubCommand};
@@ -79,6 +80,10 @@ pub enum AlfredError {
     DeleteFailed(String),
     #[error("osascript error: {0}")]
     OsascriptError(String),
+    #[error("Keychain: {0}")]
+    KeychainError(String),
+    #[error("Alfred didn't set alfred_workflow_bundleid")]
+    MissingBundleId,
     #[error("What did you do?")]
     Other,
 }
@@ -255,18 +260,29 @@ where
 #[must_use]
 pub fn redact_token(s: &str) -> String {
     const KEY: &str = "auth_token=";
-    let mut out = String::with_capacity(s.len());
-    let mut rest = s;
-    while let Some(i) = rest.find(KEY) {
-        out.push_str(&rest[..i + KEY.len()]);
-        out.push_str("<redacted>");
-        rest = &rest[i + KEY.len()..];
-        match rest.find(['&', ')', ' ']) {
-            Some(j) => rest = &rest[j..],
-            None => return out,
-        }
+    // Everything a percent-encoded Pinboard token can contain. We consume exactly
+    // this run and keep whatever follows. Scanning to the next delimiter instead
+    // would swallow the rest of the message — a `\n` or `", ` after the token used
+    // to take the following words with it.
+    fn is_token_char(c: char) -> bool {
+        c.is_ascii_alphanumeric() || matches!(c, '%' | ':' | '.' | '_' | '~' | '+' | '-')
     }
-    out.push_str(rest);
+
+    // `to_ascii_lowercase` only maps ASCII A-Z, so byte lengths and therefore all
+    // indices are preserved and can be used against the original string.
+    let haystack = s.to_ascii_lowercase();
+    let mut out = String::with_capacity(s.len());
+    let mut at = 0usize;
+    while let Some(found) = haystack[at..].find(KEY) {
+        let key_end = at + found + KEY.len();
+        out.push_str(&s[at..key_end]);
+        out.push_str("<redacted>");
+        let value_len = s[key_end..]
+            .find(|c: char| !is_token_char(c))
+            .unwrap_or(s.len() - key_end);
+        at = key_end + value_len;
+    }
+    out.push_str(&s[at..]);
     out
 }
 
@@ -331,6 +347,41 @@ mod tests {
         assert_eq!(
             redact_token("Cannot get browser's URL"),
             "Cannot get browser's URL"
+        );
+    }
+
+    /// Redaction must remove the token and nothing else. An earlier version
+    /// scanned to the next `&`, `)` or space and deleted everything in between,
+    /// which quietly ate whole words of the error message.
+    #[test]
+    fn keeps_the_rest_of_the_message() {
+        assert_eq!(
+            redact_token("failed:\nURL?auth_token=user:SECRET\nretrying later"),
+            "failed:\nURL?auth_token=<redacted>\nretrying later"
+        );
+        assert_eq!(
+            redact_token("https://x?auth_token=user:SECRET#frag more text"),
+            "https://x?auth_token=<redacted>#frag more text"
+        );
+        assert_eq!(
+            redact_token(r#"Error { url: "?auth_token=user:SECRET", source: TimedOut }"#),
+            r#"Error { url: "?auth_token=<redacted>", source: TimedOut }"#
+        );
+    }
+
+    #[test]
+    fn redacts_regardless_of_key_case() {
+        assert_eq!(
+            redact_token("?AUTH_TOKEN=user:SECRET&x=1"),
+            "?AUTH_TOKEN=<redacted>&x=1"
+        );
+    }
+
+    #[test]
+    fn handles_multibyte_text_around_the_token() {
+        assert_eq!(
+            redact_token("café ?auth_token=user:SECRET — naïve"),
+            "café ?auth_token=<redacted> — naïve"
         );
     }
 }

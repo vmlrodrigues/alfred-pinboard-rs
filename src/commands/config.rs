@@ -36,7 +36,7 @@ pub fn run(x: SubCommand) {
                 info!("{}", err.to_string());
                 let mut config = Config::new();
                 if auth_token.is_some() {
-                    config.auth_token = token;
+                    config.auth_token = token.clone();
                 } else {
                     crate::show_error_alfred(err.to_string());
                     process::exit(1);
@@ -44,7 +44,16 @@ pub fn run(x: SubCommand) {
                 config
             });
             debug!("{:?}", config);
-            config.auth_token.update(auth_token.map(|t| t.0));
+            // The token goes to the Keychain, never to settings.json. Failing to
+            // store it is fatal for this command: reporting success would leave
+            // the user believing they are authenticated when they are not.
+            if auth_token.is_some() {
+                if let Err(e) = crate::keychain::set(&token) {
+                    crate::show_error_alfred(format!("Couldn't save token to Keychain: {e}"));
+                    process::exit(1);
+                }
+                config.auth_token = token;
+            }
             config.pins_to_show.update(number_pins);
             config.tags_to_show.update(number_tags);
             // config.private_new_pin.update(!shared);

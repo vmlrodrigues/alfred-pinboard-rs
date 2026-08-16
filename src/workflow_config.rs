@@ -66,7 +66,12 @@ pub struct Config {
     pub show_url_vs_tags: bool,
     /// Flag to update cache after each bookmark saving automatically.
     pub auto_update_cache: bool,
-    /// Authentication Token
+    /// Authentication Token.
+    ///
+    /// Deserialised so an install that predates the move can still be migrated,
+    /// but never serialised — the token belongs in the Keychain, and writing it
+    /// here again would put it back in plaintext on disk. See `resolve_token`.
+    #[serde(default, skip_serializing)]
     pub auth_token: String,
     /// Last time cache was updated
     #[serde(default = "get_epoch")]
@@ -113,6 +118,7 @@ impl Config {
         debug!("Starting in setup");
         let (data_dir, cache_dir) = Config::get_workflow_dirs();
         let mut config = Config::read(data_dir, cache_dir)?;
+        config.resolve_token();
 
         // An install that predates the move to Alfred's configuration sheet has
         // its preferences only in settings.json. Push them into the sheet before
@@ -196,6 +202,47 @@ impl Config {
         self.workflow_cache_dir = dirs.1;
     }
 
+    /// Resolve the API token, moving it out of `settings.json` and into the
+    /// macOS Keychain the first time.
+    ///
+    /// Older installs kept the token in plaintext in the workflow's data
+    /// directory. On the first run after upgrading we copy it into the Keychain
+    /// and blank the stored copy, so it stops sitting on disk in the clear.
+    ///
+    /// A Keychain failure is not fatal: we carry on with the value from
+    /// `settings.json` so the workflow keeps working, and try again next run.
+    pub fn resolve_token(&mut self) {
+        debug!("Starting in resolve_token");
+        let stored_in_plaintext = !self.auth_token.is_empty();
+
+        if let Some(token) = crate::keychain::get() {
+            self.auth_token = token;
+        } else if stored_in_plaintext {
+            match crate::keychain::set(&self.auth_token) {
+                Ok(()) => info!("moved the API token into the Keychain"),
+                // Not fatal: keep using the plaintext copy so the workflow still
+                // works, and try again next run.
+                Err(e) => {
+                    error!("couldn't store the token in the Keychain: {e}");
+                    return;
+                }
+            }
+        } else {
+            return;
+        }
+
+        // `auth_token` is `skip_serializing`, so rewriting the file is what
+        // removes any lingering plaintext copy.
+        if stored_in_plaintext {
+            if let Err(e) = self.save() {
+                error!(
+                    "couldn't rewrite settings.json without the token: {}",
+                    crate::redact_token(&e.to_string())
+                );
+            }
+        }
+    }
+
     /// Overlay Alfred's workflow configuration on top of what was read from
     /// `settings.json`.
     ///
@@ -256,42 +303,103 @@ impl Config {
         use std::process::Command;
         debug!("Starting in migrate_to_alfred_config");
 
-        let bundle_id = std::env::var("alfred_workflow_bundleid")
-            .map_err(|_| AlfredError::ConfigFileErr)
-            .map_err(Box::new)?;
+        let bundle_id =
+            std::env::var("alfred_workflow_bundleid").map_err(|_| AlfredError::MissingBundleId)?;
 
-        let settings: [(&str, String); 10] = [
-            (cfg_env::TAG_ONLY_SEARCH, bool_str(self.tag_only_search)),
-            (cfg_env::FUZZY_SEARCH, bool_str(self.fuzzy_search)),
+        // (key, value from settings.json, value the configuration sheet ships with)
+        let d = Config::new();
+        let settings: [(&str, String, String); 10] = [
+            (
+                cfg_env::TAG_ONLY_SEARCH,
+                bool_str(self.tag_only_search),
+                bool_str(d.tag_only_search),
+            ),
+            (
+                cfg_env::FUZZY_SEARCH,
+                bool_str(self.fuzzy_search),
+                bool_str(d.fuzzy_search),
+            ),
             // Stored inverted — see `apply_env_overrides`.
-            (cfg_env::SHARED_NEW_PIN, bool_str(!self.private_new_pin)),
-            (cfg_env::TOREAD_NEW_PIN, bool_str(self.toread_new_pin)),
-            (cfg_env::SUGGEST_TAGS, bool_str(self.suggest_tags)),
+            (
+                cfg_env::SHARED_NEW_PIN,
+                bool_str(!self.private_new_pin),
+                bool_str(!d.private_new_pin),
+            ),
+            (
+                cfg_env::TOREAD_NEW_PIN,
+                bool_str(self.toread_new_pin),
+                bool_str(d.toread_new_pin),
+            ),
+            (
+                cfg_env::SUGGEST_TAGS,
+                bool_str(self.suggest_tags),
+                bool_str(d.suggest_tags),
+            ),
             (
                 cfg_env::PAGE_IS_BOOKMARKED,
                 bool_str(self.page_is_bookmarked),
+                bool_str(d.page_is_bookmarked),
             ),
-            (cfg_env::SHOW_URL_VS_TAGS, bool_str(self.show_url_vs_tags)),
-            (cfg_env::AUTO_UPDATE_CACHE, bool_str(self.auto_update_cache)),
-            (cfg_env::PINS_TO_SHOW, self.pins_to_show.to_string()),
-            (cfg_env::TAGS_TO_SHOW, self.tags_to_show.to_string()),
+            (
+                cfg_env::SHOW_URL_VS_TAGS,
+                bool_str(self.show_url_vs_tags),
+                bool_str(d.show_url_vs_tags),
+            ),
+            (
+                cfg_env::AUTO_UPDATE_CACHE,
+                bool_str(self.auto_update_cache),
+                bool_str(d.auto_update_cache),
+            ),
+            (
+                cfg_env::PINS_TO_SHOW,
+                self.pins_to_show.to_string(),
+                d.pins_to_show.to_string(),
+            ),
+            (
+                cfg_env::TAGS_TO_SHOW,
+                self.tags_to_show.to_string(),
+                d.tags_to_show.to_string(),
+            ),
         ];
 
         // One osascript invocation for all ten: spawning it ten times would add
         // a noticeable delay to the keystroke that happens to trigger this.
         let mut script = String::from("tell application id \"com.runningwithcrayons.Alfred\"\n");
-        for (key, value) in &settings {
+        let mut wrote = 0usize;
+        for (key, stored, shipped_default) in &settings {
+            // Alfred hands us a value for every key, because the sheet ships with
+            // defaults — so "is the variable set?" cannot tell us whether the user
+            // has been in the panel. What it can tell us is whether the value still
+            // equals the shipped default. Anything that differs was chosen
+            // deliberately there and must survive this migration: reading the
+            // release note, opening the panel and setting things up before the
+            // first keystroke is exactly what a careful user would do.
+            if std::env::var(*key).is_ok_and(|current| current.trim() != shipped_default) {
+                debug!("{key} already customised in the configuration sheet, not overwriting");
+                continue;
+            }
             script.push_str(&format!(
-                "set configuration \"{key}\" to value \"{value}\" in workflow \"{bundle_id}\"\n"
+                "set configuration \"{key}\" to value \"{stored}\" in workflow \"{bundle_id}\"\n"
             ));
+            wrote += 1;
         }
         script.push_str("end tell");
+
+        if wrote == 0 {
+            debug!("nothing to migrate; the configuration sheet is already set up");
+            return Ok(());
+        }
 
         let output = Command::new("osascript").arg("-e").arg(&script).output()?;
         if output.status.success() {
             Ok(())
         } else {
-            Err(Box::new(AlfredError::ConfigFileErr))
+            // Report what actually failed. Mapping this to ConfigFileErr told the
+            // user to "set API token again" for a problem that has nothing to do
+            // with their token, and threw away osascript's message.
+            Err(Box::new(AlfredError::OsascriptError(
+                String::from_utf8_lossy(&output.stderr).trim().to_owned(),
+            )))
         }
     }
 

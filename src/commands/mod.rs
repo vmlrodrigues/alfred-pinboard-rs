@@ -46,14 +46,24 @@ impl Runner<'_, '_> {
         }
 
         let json_format = self.config.as_ref().unwrap().can_use_json();
-        // Get username from auth_token
-        let idx = self
-            .config
-            .as_ref()
-            .unwrap()
-            .auth_token
-            .find(':')
-            .ok_or_else(|| "Bad Auth. Token!".to_string())?;
+        // Get username from auth_token.
+        //
+        // Returning early here used to write *no items at all* and exit 0, so a
+        // malformed token produced an empty Alfred window with the reason only on
+        // stderr. Show the error instead.
+        let token = &self.config.as_ref().unwrap().auth_token;
+        let Some(idx) = token.find(':') else {
+            error!("auth token has no ':' separator");
+            crate::write_to_alfred(
+                vec![crate::alfred_error_item(
+                    "Bad Auth. Token! Set it again with `pa`.",
+                )],
+                json_format,
+                // No `username` variable to export: we could not parse one.
+                None::<Vec<(&str, &str)>>,
+            );
+            return Ok(());
+        };
         let username = &self.config.as_ref().unwrap().auth_token.as_str()[..idx];
         let mut variables = vec![("username", username)];
         if let Some(items) = vars {

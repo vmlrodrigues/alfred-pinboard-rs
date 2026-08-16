@@ -199,6 +199,7 @@ on run
           set w to item 1 of window 1
           set theText to name of w
         end tell
+        set theURL to \"\"
         tell application \"System Events\"
           set myApp to name of first application process whose frontmost is true
           if myApp is \"Firefox\" then
@@ -208,33 +209,40 @@ on run
               keystroke \"c\" using command down
             end tell
             delay 0.5
+            set theURL to get the clipboard
           end if
           delay 0.5
         end tell
-        set theURL to get the clipboard
         return {theURL, theText}"
 		set theURL to item 1 of theResult
 		set theText to item 2 of theResult
 		
-	else if {"Firefox Developer Edition.app", "FirefoxDeveloperEdition.app"} contains theApplication and appIsRunning("Firefox") then
+		-- The process is named after the app bundle, so it is "Firefox Developer
+		-- Edition", not "Firefox". Asking appIsRunning("Firefox") was wrong twice
+		-- over: it missed when only Dev Edition was running, and it *matched* when
+		-- plain Firefox happened to be running too — in which case the inner guard
+		-- below failed and the old code returned whatever was already on the
+		-- clipboard as the URL, silently bookmarking the wrong page.
+	else if {"Firefox Developer Edition.app", "FirefoxDeveloperEdition.app"} contains theApplication and (appIsRunning("Firefox Developer Edition") or appIsRunning("FirefoxDeveloperEdition")) then
 		set theResult to run script "tell application id \"org.mozilla.firefoxdeveloperedition\"
           activate
           set w to item 1 of window 1
           set theText to name of w
         end tell
+        set theURL to \"\"
         tell application \"System Events\"
           set myApp to name of first application process whose frontmost is true
-          if myApp is \"Firefox\" then
+          if myApp is \"Firefox Developer Edition\" or myApp is \"FirefoxDeveloperEdition\" then
             tell application \"System Events\"
               keystroke \"l\" using command down
               delay 0.5
               keystroke \"c\" using command down
             end tell
             delay 0.5
+            set theURL to get the clipboard
           end if
           delay 0.5
         end tell
-        set theURL to get the clipboard
         return {theURL, theText}"
 		set theURL to item 1 of theResult
 		set theText to item 2 of theResult

@@ -88,7 +88,6 @@ rm alfred-pinboard-rs
 cd "$alfred_pinboard_rs" || exit
 git add .github
 git add res/workflow
-git add res/images
 git add Cargo.toml
 git add Cargo.lock
 git add CHANGELOG.md

@@ -104,9 +104,17 @@ impl Runner<'_, '_> {
                         // `query_words` comes from `split_whitespace`, which splits on any Unicode
                         // whitespace, so the separator here is not necessarily an ASCII space —
                         // pasted text often carries U+00A0 or a tab.
+                        //
+                        // `rfind` reports the *start* byte of that separator, so the slice has to
+                        // run to the end of the character. Ending at the start byte lands inside a
+                        // multi-byte separator, and `get` then returns None — which silently threw
+                        // away every tag the user had already typed.
                         queries
                             .rfind(char::is_whitespace)
-                            .and_then(|i| queries.get(0..=i))
+                            .and_then(|i| {
+                                let sep_len = queries[i..].chars().next().map_or(1, char::len_utf8);
+                                queries.get(0..i + sep_len)
+                            })
                             .unwrap_or("")
                     } else {
                         ""
@@ -357,6 +365,10 @@ fn retrieve_popular_tags(exec_counter: usize) -> Result<Vec<Tag>, Box<dyn std::e
                     crate::redact_token(&e.to_string())
                 );
                 tags = vec![];
+                // Overwrite the cache too. Leaving the previous page's tags there
+                // means the next keystroke reads them back and offers suggestions
+                // for a completely different URL.
+                Data::save_to_file(ptags_fn, &tags)?;
             }
         }
     } else {
