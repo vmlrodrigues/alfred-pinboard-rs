@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-08-16
+### Fixed
+- `pa` now confirms straight away that the token was saved. The
+  "Successfully set user credentials" message is consumed by a conditional purely as a
+  routing signal, so the only notification came *after* the full bookmark download had
+  finished — a long silent gap that reads as though nothing happened. A notification now
+  fires the moment the token reaches the Keychain, in parallel with the download rather
+  than delaying it.
+
 ## [0.25.0] - 2026-08-16
 ### Added
 - **The binary is now signed with a Developer ID and notarised by Apple.** Without it,
@@ -427,7 +436,8 @@ Improve error messages dusing post/delete/search operations.
 
 <!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
      Earlier releases live in the upstream repository and are tagged bare. -->
-[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.25.0...HEAD
+[Unreleased]: https://github.com/vmlrodrigues/pinion/compare/v0.25.1...HEAD
+[0.25.1]: https://github.com/vmlrodrigues/pinion/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/vmlrodrigues/pinion/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/vmlrodrigues/pinion/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/vmlrodrigues/pinion/compare/v0.23.0...v0.24.0

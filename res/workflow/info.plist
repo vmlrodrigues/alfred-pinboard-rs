@@ -670,6 +670,18 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A1C0FFEE-1111-4A2B-9C3D-5E6F70819293</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>BCA24D57-E642-440C-BD0F-D4DEF49C9592</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 		<key>75434858-9B72-456E-A107-4B11F87365A4</key>
 		<array>
@@ -4323,6 +4335,27 @@ end run</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>Token saved to your Keychain. Downloading your bookmarks…</string>
+				<key>title</key>
+				<string>Pinion 📌</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>A1C0FFEE-1111-4A2B-9C3D-5E6F70819293</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>Pinion manages your Pinboard bookmarks from Alfred.
@@ -4892,6 +4925,15 @@ rename by iconmu from the Noun Project</string>
 			<key>ypos</key>
 			<real>160.0</real>
 		</dict>
+		<key>A1C0FFEE-1111-4A2B-9C3D-5E6F70819293</key>
+		<dict>
+			<key>note</key>
+			<string>Confirm the token was saved.</string>
+			<key>xpos</key>
+			<real>920.0</real>
+			<key>ypos</key>
+			<real>1700.0</real>
+		</dict>
 		<key>A2481ADE-0AF6-4C3D-8E9B-E389206CD571</key>
 		<dict>
 			<key>xpos</key>
@@ -5300,7 +5342,7 @@ rename by iconmu from the Noun Project</string>
 		</dict>
 	</array>
 	<key>version</key>
-	<string>0.25.0</string>
+	<string>0.25.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/vmlrodrigues/pinion</string>
 </dict>
