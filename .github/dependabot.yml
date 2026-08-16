@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # The CI here broke once because macos-11 was retired and actions-rs/* was
+  # archived, all of which landed as one dead pipeline rather than as notice.
+  # This turns that class of rot into incremental PRs instead.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # rusty-pin is a git dependency pinned by rev, so Dependabot will not
+    # touch it. It is updated by hand from the fork at vmlrodrigues/rusty-pin.
+    open-pull-requests-limit: 5

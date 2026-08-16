@@ -100,8 +100,14 @@ impl Runner<'_, '_> {
                 Ok(results) => {
                     let prev_tags = if query_words.len() > 1 {
                         // User has already searched for other tags, we should include those in the
-                        // 'autocomplete' field of the AlfredItem
-                        queries.get(0..=queries.rfind(' ').unwrap()).unwrap()
+                        // 'autocomplete' field of the AlfredItem.
+                        // `query_words` comes from `split_whitespace`, which splits on any Unicode
+                        // whitespace, so the separator here is not necessarily an ASCII space —
+                        // pasted text often carries U+00A0 or a tab.
+                        queries
+                            .rfind(char::is_whitespace)
+                            .and_then(|i| queries.get(0..=i))
+                            .unwrap_or("")
                     } else {
                         ""
                     };
@@ -137,10 +143,14 @@ impl Runner<'_, '_> {
                             i
                         }
                         None => {
-                            assert!(!query_words.is_empty());
                             debug!("Didn't find any tag for `{}`", last_query_word);
                             filter_idx = None;
-                            top_items.insert(0, last_query_word_tag);
+                            // An account with no tags at all returns None for any query,
+                            // including an empty one. Offering "" as a new tag would show a
+                            // blank row, so only offer one when the user actually typed something.
+                            if !last_query_word.is_empty() {
+                                top_items.insert(0, last_query_word_tag);
+                            }
                             vec![]
                         }
                     };
@@ -332,12 +342,23 @@ fn retrieve_popular_tags(exec_counter: usize) -> Result<Vec<Tag>, Box<dyn std::e
     if exec_counter == 1 {
         let tab_info = browser_info::get()?;
         warn!("tab_info.url: {:?}", tab_info.url);
-        tags = match pinboard.popular_tags(&tab_info.url) {
-            Err(e) => vec![format!("ERROR: fetching popular tags: {:?}", e)],
-            Ok(tags) => tags,
-        };
-        info!("popular tags: {:?}", tags);
-        Data::save_to_file(ptags_fn, &tags)?;
+        match pinboard.popular_tags(&tab_info.url) {
+            Ok(t) => {
+                tags = t;
+                info!("popular tags: {:?}", tags);
+                Data::save_to_file(ptags_fn, &tags)?;
+            }
+            Err(e) => {
+                // Never turn the error into a tag: it is shown as a selectable
+                // Alfred row and cached to disk, and its text can contain the
+                // API token. Log it redacted and offer no suggestions instead.
+                error!(
+                    "fetching popular tags: {}",
+                    crate::redact_token(&e.to_string())
+                );
+                tags = vec![];
+            }
+        }
     } else {
         warn!(
             "**** reading suggested tags from cache file: {:?}",

@@ -25,8 +25,8 @@ pub fn run(x: SubCommand) {
             print_config = display;
             let mut token = String::new();
             if let Some(ref t) = auth_token {
-                if t.find(':').is_some() {
-                    token.clone_from(t);
+                if t.0.find(':').is_some() {
+                    token.clone_from(&t.0);
                 } else {
                     crate::show_error_alfred("Invalid Auth Token format!".to_string());
                     process::exit(1);
@@ -44,7 +44,7 @@ pub fn run(x: SubCommand) {
                 config
             });
             debug!("{:?}", config);
-            config.auth_token.update(auth_token);
+            config.auth_token.update(auth_token.map(|t| t.0));
             config.pins_to_show.update(number_pins);
             config.tags_to_show.update(number_tags);
             // config.private_new_pin.update(!shared);
@@ -61,7 +61,11 @@ pub fn run(x: SubCommand) {
     }
 
     if let Err(e) = config.save() {
+        // Exit non-zero so the caller knows the save failed. The workflow's
+        // `pa` action already branches on our exit code and prints its own
+        // message, so we deliberately don't write an Alfred item here.
         error!("Couldn't save config file: {:?}", e);
+        process::exit(1);
     } else {
         debug!(
             "Saved new configs to {} in: {}",

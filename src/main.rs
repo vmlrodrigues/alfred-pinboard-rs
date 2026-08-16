@@ -159,7 +159,7 @@ fn main() {
             process::exit(1);
         });
 
-        let mut updater = Updater::gh("spamwax/alfred-pinboard-rs").unwrap();
+        let mut updater = Updater::gh("vmlrodrigues/alfred-pinboard-rs").unwrap();
 
         // If running ./alfred-pinboard-rs self -c, we have to make a network call
         // We do this by forcing the check interval to be zero
@@ -180,7 +180,11 @@ fn main() {
         };
         match opt.cmd {
             SubCommand::Update => {
-                runner.update_cache(false);
+                // Force the download. Asking for `pupdate` explicitly is the only way a
+                // user can rebuild a corrupt or truncated cache — deferring to the
+                // server's timestamp here would answer "already up-to-date" and leave
+                // them stuck. The automatic post-write refreshes still pass `false`.
+                runner.update_cache(true);
             }
             SubCommand::List { .. } => {
                 runner.list(opt);
@@ -246,10 +250,34 @@ where
             .expect("Couldn't write items to Alfred");
     }
 }
+/// Remove the Pinboard API token from a string.
+///
+/// `rusty-pin` sends the token as a URL query parameter and `reqwest` includes
+/// the full URL in its error text, so any error may carry the user's
+/// credentials. Anything that displays, logs, or persists an error goes through
+/// here first.
+#[must_use]
+pub fn redact_token(s: &str) -> String {
+    const KEY: &str = "auth_token=";
+    let mut out = String::with_capacity(s.len());
+    let mut rest = s;
+    while let Some(i) = rest.find(KEY) {
+        out.push_str(&rest[..i + KEY.len()]);
+        out.push_str("<redacted>");
+        rest = &rest[i + KEY.len()..];
+        match rest.find(['&', ')', ' ']) {
+            Some(j) => rest = &rest[j..],
+            None => return out,
+        }
+    }
+    out.push_str(rest);
+    out
+}
+
 fn show_error_alfred<'a, T: Into<Cow<'a, str>>>(s: T) {
     debug!("Starting in show_error_alfred");
     let item = alfred::ItemBuilder::new("Error")
-        .subtitle(s)
+        .subtitle(redact_token(&s.into()))
         .icon_path("erroricon.icns")
         .into_item();
     alfred::json::write_items(io::stdout(), &[item]).expect("Can't write to stdout");
@@ -259,7 +287,54 @@ fn show_error_alfred<'a, T: Into<Cow<'a, str>>>(s: T) {
 fn alfred_error_item<'a, T: Into<Cow<'a, str>>>(s: T) -> alfred::Item<'a> {
     debug!("Starting in alfred_error");
     alfred::ItemBuilder::new("Error")
-        .subtitle(s)
+        .subtitle(redact_token(&s.into()))
         .icon_path("erroricon.icns")
         .into_item()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::redact_token;
+
+    #[test]
+    fn redacts_token_followed_by_another_parameter() {
+        assert_eq!(
+            redact_token("https://api.pinboard.in/v1/posts/all?auth_token=user:ABC123&format=json"),
+            "https://api.pinboard.in/v1/posts/all?auth_token=<redacted>&format=json"
+        );
+    }
+
+    #[test]
+    fn redacts_token_at_end_of_string() {
+        assert_eq!(
+            redact_token("failed: https://api.pinboard.in/v1/tags/get?auth_token=user:ABC123"),
+            "failed: https://api.pinboard.in/v1/tags/get?auth_token=<redacted>"
+        );
+    }
+
+    /// reqwest renders errors as `... for url (<url>)`, so the token is closed
+    /// by a paren rather than by `&` or end-of-string.
+    #[test]
+    fn redacts_token_closed_by_paren() {
+        assert_eq!(
+            redact_token("error sending request for url (https://api.pinboard.in/v1/posts/suggest?auth_token=user:ABC123)"),
+            "error sending request for url (https://api.pinboard.in/v1/posts/suggest?auth_token=<redacted>)"
+        );
+    }
+
+    #[test]
+    fn redacts_every_occurrence() {
+        assert_eq!(
+            redact_token("auth_token=a:1 and auth_token=b:2"),
+            "auth_token=<redacted> and auth_token=<redacted>"
+        );
+    }
+
+    #[test]
+    fn leaves_unrelated_text_alone() {
+        assert_eq!(
+            redact_token("Cannot get browser's URL"),
+            "Cannot get browser's URL"
+        );
+    }
 }

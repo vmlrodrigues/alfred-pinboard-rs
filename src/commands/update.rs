@@ -10,7 +10,7 @@ impl Runner<'_, '_> {
                 .write_all(s.as_bytes())
                 .expect("Couldn't write to stdout"),
             Err(e) => {
-                let msg = ["Error: ", e.to_string().as_str()].concat();
+                let msg = ["Error: ", crate::redact_token(&e.to_string()).as_str()].concat();
                 io::stdout()
                     .write_all(msg.as_bytes())
                     // .write_all(e.to_string().as_bytes())
@@ -28,7 +28,7 @@ impl Runner<'_, '_> {
             .is_cache_outdated(self.config.as_ref().unwrap().update_time)
         {
             Err(e) => {
-                error!("{}", e.to_string());
+                error!("{}", crate::redact_token(&e.to_string()));
                 Err(crate::AlfredError::CacheUpdateFailed(
                     "comparing timestamp with server failed".to_string(),
                 )
@@ -42,14 +42,14 @@ impl Runner<'_, '_> {
                         .unwrap()
                         .update_cache()
                         .map_err(|e| {
-                            error!("{}", e.to_string());
+                            error!("{}", crate::redact_token(&e.to_string()));
                             crate::AlfredError::CacheUpdateFailed("update_cache failed".to_string())
                         })?;
                     self.config
                         .as_mut()
                         .map(|config| config.update_time = Utc::now());
                     self.config.as_mut().unwrap().save().map_err(|e| {
-                        error!("{}", e.to_string());
+                        error!("{}", crate::redact_token(&e.to_string()));
                         crate::AlfredError::CacheUpdateFailed(
                             "saving update timestamp failed".to_string(),
                         )

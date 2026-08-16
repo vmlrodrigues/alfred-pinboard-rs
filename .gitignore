@@ -6,7 +6,11 @@ auth_token.txt
 .rustfmt.toml
 build.log
 build_*.log
-AlfredPinboardRust.alfredworkflow
+# Release bundles, whatever they are named
+AlfredPinboardRust*.alfredworkflow
 Cargo.toml.back
 run_exec.sh
-alfred-pinboard-rs
+# The built binary, staged here by a local run of create_alfred_workflow.sh.
+# Anchored so it cannot accidentally match a directory elsewhere in the tree.
+/res/workflow/alfred-pinboard-rs
+.DS_Store

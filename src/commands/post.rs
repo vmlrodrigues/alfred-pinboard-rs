@@ -16,7 +16,7 @@ impl Runner<'_, '_> {
                 }
             }
             Err(e) => {
-                let msg = ["Error: ", e.to_string().as_str()].concat();
+                let msg = ["Error: ", crate::redact_token(&e.to_string()).as_str()].concat();
                 io::stdout()
                     .write_all(msg.as_bytes())
                     .expect("Couldn't write to stdout");
@@ -58,7 +58,7 @@ impl Runner<'_, '_> {
         }
 
         let browser_tab_info = browser_info::get().map_err(|e| {
-            error!("{}", e.to_string());
+            error!("{}", crate::redact_token(&e.to_string()));
             AlfredError::Post2PinboardFailed("cannot get browser's info".to_string())
         })?;
         // let browser_tab_info = browser_info::get().unwrap_or_else(|e| {
@@ -85,7 +85,7 @@ impl Runner<'_, '_> {
             .unwrap()
             .add_pin(pin_builder.into_pin())
             .map_err(|e| {
-                error!("{}", e.to_string());
+                error!("{}", crate::redact_token(&e.to_string()));
                 AlfredError::Post2PinboardFailed("Could not post to Pinboard.".to_string())
             })?;
         Ok(format!("Successfully posted: {}\n", browser_tab_info.title))

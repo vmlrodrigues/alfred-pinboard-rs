@@ -1,8 +1,11 @@
 [package]
 name = "alfred-pinboard-rs"
-version = "0.17.2"
-authors = [ "Hamid Ghadyani <hamid@hamid.cc>",]
+version = "0.18.0"
+authors = [ "Hamid Ghadyani <hamid@hamid.cc>", "Victor Rodrigues",]
 edition = "2021"
+description = "Alfred workflow for Pinboard.in bookmarks, written in Rust."
+license = "MIT"
+repository = "https://github.com/vmlrodrigues/alfred-pinboard-rs"
 
 [dependencies]
 alfred = "4.0.1"
@@ -22,8 +25,8 @@ env_logger = "0.10"
 version = "0.7"
 
 [dependencies.rusty-pin]
-git = "https://github.com/spamwax/rusty-pin"
-branch = "master"
+git = "https://github.com/vmlrodrigues/rusty-pin"
+rev = "2681a76009386aac5613e6d842d085afa1af6149"
 
 [dependencies.chrono]
 version = "0.4"

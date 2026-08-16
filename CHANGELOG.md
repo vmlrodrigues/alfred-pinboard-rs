@@ -6,9 +6,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.17.2] - 2026-01-15
+## [0.18.0] - 2026-08-16
+This is the first release from the maintained fork at
+[vmlrodrigues/alfred-pinboard-rs](https://github.com/vmlrodrigues/alfred-pinboard-rs).
+
+### Security
+- The Pinboard API token is no longer printed into Alfred's debug window. It is passed as
+  a token type whose `Debug` implementation redacts it, so it cannot leak by accident again.
+- The API token can no longer reach the UI, logs, or disk through error messages. The
+  token travels as a URL query parameter and network errors quote the full URL, so all
+  error text is now redacted before it is displayed, logged, or cached.
+- A failed popular-tags fetch is no longer stored as a bookmark tag. The error was written
+  to the tag cache and shown as a selectable Alfred row.
+
+### Fixed
+- Self-update now targets this fork. It previously polled the upstream repository, so an
+  upstream release would have replaced this workflow with theirs.
+- No longer panics when a query contains non-ASCII whitespace, such as the non-breaking
+  space you get when pasting from a web page.
+- No longer panics when listing tags on an account that has no tags.
+- A configuration save that fails now exits non-zero instead of reporting success.
+- `pu` / `pupdate` now forces a full download, so a corrupt cache can actually be rebuilt.
+
+### Changed
+- `rusty-pin` is now sourced from a fork and pinned by revision, so `cargo update` can no
+  longer break the build or silently pull in unreviewed upstream changes.
+- Release bundles are built from the files git tracks rather than a blanket copy, dropping
+  about 532 KB of orphaned images and stray files that shipped in every previous release.
+- The release asset is now named `AlfredPinboardRust.alfredworkflow` without the version,
+  making `releases/latest/download/…` a permanent link.
+- Workflow identity (`createdby`, `webaddress`, in-Alfred readme) now points at this fork.
+  The `bundleid` is deliberately unchanged so existing installs keep their cache and token.
+- Rewrote the README, added a download button, and added Dependabot for CI and crates.
+
+### Removed
+- Deleted dead CI: `appveyor.yml`, `disable-travis`, `ci/`, `.circleci-disabled/`.
+- Deleted `res/workflow/foo.txt` and the unused `identify-browser.applescript`.
+- Removed `FUNDING.yml`, which pointed sponsorship at the original author's account.
+
+## [0.17.2] - 2026-06-29
 ### Added
 - Add support for Helium browser in active tab detection.
+### Changed
+- Replace retired `macos-11`/`macos-12` runners and archived `actions-rs/*` actions;
+  update `checkout`, `upload-artifact`, `download-artifact` to v4 and `action-gh-release`
+  to v2; pin `MACOSX_DEPLOYMENT_TARGET` to 11.0.
+- Fix pre-existing `clippy::pedantic` and `rustfmt` errors across `src/`.
 
 ## [0.17.1] - 2023-06-22
 ### Added
@@ -168,3 +211,38 @@ Improve error messages dusing post/delete/search operations.
 ## [0.13.3] - 2018-05-29
 ### Fixed
 - Fixes issue [#7](https://github.com/spamwax/alfred-pinboard-rs/issues/7)
+
+<!-- Releases from 0.17.2 onward are published by this fork and tagged vX.Y.Z.
+     Earlier releases live in the upstream repository and are tagged bare. -->
+[Unreleased]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/vmlrodrigues/alfred-pinboard-rs/compare/v0.17.2...v0.18.0
+[0.17.2]: https://github.com/vmlrodrigues/alfred-pinboard-rs/releases/tag/v0.17.2
+[0.17.1]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.17.1
+[0.17.0]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.17.0
+[0.16.12]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.12
+[0.16.11]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.11
+[0.16.10]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.10
+[0.16.9]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.9
+[0.16.8]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.8
+[0.16.6]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.6
+[0.16.5]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.5
+[0.16.4]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.4
+[0.16.3]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.3
+[0.16.0]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.16.0
+[0.15.14]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.14
+[0.15.13]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.13
+[0.15.12]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.12
+[0.15.11]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.11
+[0.15.10]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.10
+[0.15.8]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.8
+[0.15.7]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.7
+[0.15.6]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.6
+[0.15.4]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.15.4
+[0.14.9]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.9
+[0.14.8]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.8
+[0.14.7]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.7
+[0.14.6]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.6
+[0.14.5]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.5
+[0.14.4]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.4
+[0.14.0]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.14.0
+[0.13.3]: https://github.com/spamwax/alfred-pinboard-rs/releases/tag/0.13.3

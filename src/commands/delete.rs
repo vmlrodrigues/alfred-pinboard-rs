@@ -27,7 +27,7 @@ impl Runner<'_, '_> {
                 }
             }
             Err(e) => {
-                let msg = ["Error: ", e.to_string().as_str()].concat();
+                let msg = ["Error: ", crate::redact_token(&e.to_string()).as_str()].concat();
                 io::stdout()
                     .write_all(msg.as_bytes())
                     .expect("Couldn't write to stdout");
@@ -48,7 +48,7 @@ impl Runner<'_, '_> {
                 .unwrap()
                 .delete_tag(tag)
                 .map_err(|e| {
-                    error!("{}", e.to_string());
+                    error!("{}", crate::redact_token(&e.to_string()));
                     AlfredError::DeleteFailed("couldn't delete tag".to_string())
                 })?;
             return Ok("Successfully deleted tag.".to_string());
@@ -56,7 +56,7 @@ impl Runner<'_, '_> {
         if let Some(url) = url {
             debug!("  url: {}", url);
             self.pinboard.as_ref().unwrap().delete(&url).map_err(|e| {
-                error!("{}", e.to_string());
+                error!("{}", crate::redact_token(&e.to_string()));
                 AlfredError::DeleteFailed("couldn't delete url".to_string())
             })?;
             Ok("Successfully deleted bookmark.".to_string())

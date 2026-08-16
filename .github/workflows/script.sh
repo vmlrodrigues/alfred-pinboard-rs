@@ -14,13 +14,16 @@ build_alfred_bundle() {
     # TODO Update this to build the artifacts that matter to you
     # cross rustc --bin alfred-pinboard-rs --target "$TARGET" --release -- -C lto
 
-    # TODO Update this to package the right artifacts
-    # res_dir="$src/res/workflow"
-    res_dir="$src/res/workflow"
-
     # echo "Copying executable to workflow's folder..."
     cp "alfred-pinboard-rs" "$stage"
-    cp "$res_dir"/* "$stage"
+
+    # Ship exactly what git tracks under res/workflow. The old blanket
+    # `cp res/workflow/*` also swept up whatever happened to be sitting in that
+    # directory — including, if you had ever run a local build, a 4 MB binary and
+    # the previous .alfredworkflow nested inside the new one.
+    git -C "$src" ls-files -z res/workflow | while IFS= read -r -d '' f; do
+        cp "$src/$f" "$stage"
+    done
 
     # echo "Creating the workflow bundle..."
     cd "$stage" || exit
@@ -28,7 +31,10 @@ build_alfred_bundle() {
 
     zip -r AlfredPinboardRust.alfredworkflow ./*
 
-    mv ./AlfredPinboardRust.alfredworkflow "$src"/AlfredPinboardRust-"$GITHUB_REF_NAME".alfredworkflow
+    # Deliberately unversioned: it makes
+    #   releases/latest/download/AlfredPinboardRust.alfredworkflow
+    # a permanent download link. The release tag already carries the version.
+    mv ./AlfredPinboardRust.alfredworkflow "$src"/AlfredPinboardRust.alfredworkflow
     cd "$src"
 
 }

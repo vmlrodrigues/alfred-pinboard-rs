@@ -1,3 +1,23 @@
+/// Pinboard API token that never appears in `Debug` output.
+///
+/// `SubCommand` derives `Debug` and is logged in `main`, so holding the token
+/// in a bare `String` would print it into Alfred's debug window.
+#[derive(Clone)]
+pub struct AuthToken(pub String);
+
+impl std::str::FromStr for AuthToken {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_owned()))
+    }
+}
+
+impl std::fmt::Debug for AuthToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<redacted>")
+    }
+}
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "alfred-pinboard")]
 /// Command line component of Alfred Workflow for Pinboard (Written in Rust!)
@@ -24,7 +44,7 @@ pub enum SubCommand {
         /// Set API authorization token.
         /// (Obtain it from your Pinboard account's setting page).
         #[structopt(name = "auth", long = "authorization", short = "a")]
-        auth_token: Option<String>,
+        auth_token: Option<AuthToken>,
 
         /// Number of bookmarks to show in Alfred's window. [default: 10]
         #[structopt(long = "bookmark-numbers", short = "p")]

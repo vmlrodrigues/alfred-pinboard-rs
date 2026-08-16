@@ -1267,7 +1267,7 @@
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>Hamid R. Ghadyani</string>
+	<string>Victor Rodrigues (originally by Hamid R. Ghadyani)</string>
 	<key>description</key>
 	<string>Add &amp; search your Pinboard's bookmarks.</string>
 	<key>disabled</key>
@@ -4245,10 +4245,11 @@ end run</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>This is a Workflow to manage your Pinboard bookmarks.
-I mainly wrote this so I can learn/practice Rust language.
-Make sure you set your authenticaton token first before first use.
-Detailed instructions are available at https://github.com/spamwax/alfred-pinboard-rs</string>
+	<string>Manage your Pinboard bookmarks from Alfred.
+Set your Pinboard authentication token with `pa` before first use.
+Detailed instructions are available at https://github.com/vmlrodrigues/alfred-pinboard-rs
+
+A maintained fork of the original workflow by Hamid R. Ghadyani.</string>
 	<key>uidata</key>
 	<dict>
 		<key>0016C9AE-9AF1-45C8-A89B-663CCA5FBF2C</key>
@@ -5024,8 +5025,8 @@ rename by iconmu from the Noun Project</string>
 	<key>userconfigurationconfig</key>
 	<array/>
 	<key>version</key>
-	<string>0.17.2</string>
+	<string>0.18.0</string>
 	<key>webaddress</key>
-	<string>https://github.com/spamwax/alfred-pinboard-rs</string>
+	<string>https://github.com/vmlrodrigues/alfred-pinboard-rs</string>
 </dict>
 </plist>
